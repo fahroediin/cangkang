@@ -15,8 +15,7 @@ Bangun aplikasi web mobile-first bernama **TelurFarm** sesuai dokumen ini.
 - Semua data bisnis lewat lapisan `src/services/`. Buat interface `DataService` dengan dua implementasi: `mockService.ts` (localStorage, untuk pratinjau di AI Studio) dan `supabaseService.ts` (untuk pilot). Pilih lewat `VITE_DATA_MODE=mock|supabase`, default `mock`.
 - Implementasi `supabaseService` WAJIB memanggil RPC yang tercantum di bagian 9. Jangan menghitung harga, stok, jarak kelayakan, atau status di klien lalu menulis langsung ke tabel.
 - Jangan pernah menaruh service role key Supabase di kode klien. Hanya `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY`.
-- Jangan pakai emoji di UI.
-- Status selalu ditulis sebagai teks, tidak hanya warna.
+- Tampilan dan teks UI WAJIB mengikuti bagian 6. Sebelum menyerahkan hasil, periksa layar satu per satu terhadap tabel larangan 6.1 dan token 6.2. Jika ada pola dari 6.1 yang muncul, ganti sebelum melapor selesai.
 
 ---
 
@@ -126,29 +125,146 @@ Keranjang disimpan di localStorage dengan kunci `tf_cart` (boleh, ini data klien
 
 ---
 
-## 6. Sistem visual
+## 6. Tampilan dan teks UI
 
-Ambil dari Mockup Desain TelurFarm v3.
+TelurFarm dipakai warga untuk belanja kebutuhan dapur dan oleh penjaga ruko untuk bekerja seharian. Tampilannya harus terasa seperti warung yang rapi dan bisa dipercaya, bukan landing page startup. Bagian 6.1 sampai 6.5 mengatur tampilan. Bagian 6.6 mengatur tulisan.
 
-| Token Tailwind | Hex | Pakai |
+### 6.1 Dilarang
+
+Pola berikut adalah tanda tampilan buatan AI. Satu pun tidak boleh muncul.
+
+| Pola | Ganti dengan |
+|---|---|
+| Gradient di latar, tombol, teks, atau border | Warna solid dari token 6.2 |
+| Glassmorphism, blur latar, glow, neon | Permukaan `surface` solid dengan border 1px `line` |
+| Hero banner dengan slogan ("Telur segar langsung dari kandang") di atas katalog | Katalog langsung di bawah header. Satu baris info "Gratis ongkir dalam 5 km dari depo" |
+| Foto stok, ilustrasi orang, blob pastel, pola latar | Latar `cream` polos. Gambar produk hanya jika owner menyediakan foto telur asli; tanpa foto, kartu tanpa gambar |
+| Ilustrasi telur kartun, ayam maskot | Tidak ada |
+| Emoji sebagai ikon atau hiasan | Ikon garis Lucide 20px, hanya di samping label (keranjang, lokasi, telepon, WhatsApp) |
+| Ikon dalam lingkaran berwarna di atas setiap judul atau kartu | Judul cukup teks |
+| Grid tiga kartu "Kenapa memilih kami" dengan ikon, judul, satu kalimat | Tidak ada. Halaman hanya memuat yang ada di bagian 5 |
+| Kartu statistik dengan panah naik dan persentase hijau di A6 | Angka apa adanya dengan label, tanpa panah, tanpa warna naik turun |
+| Grafik dekoratif | A6 tanpa grafik. Tabel per depo sudah menjawab pertanyaan owner |
+| Shadow besar dan berlapis di semua kartu | Border 1px `line`. Shadow `0 4px 12px rgb(51 37 27 / 0.12)` hanya untuk toast, dialog, dan bar bawah |
+| Radius 16px ke atas di semua elemen | Radius 8px untuk kartu, field, tombol. Bentuk pill hanya untuk badge status |
+| Semua konten rata tengah | Rata kiri. Rata tengah hanya untuk keadaan kosong |
+| Animasi membal, membesar saat hover, angka berputar, confetti saat pesanan terkirim | Transisi 150ms hanya untuk muncul dan hilangnya toast, dialog, dan dropdown |
+| Skeleton atau spinner di seluruh layar | Lihat 6.4 |
+| Badge "Promo", "Terlaris", "Baru" di produk, rating bintang, jumlah terjual | Tidak ada. Satu-satunya label promosi adalah "Gratis ongkir" di kartu depo |
+| Hitung mundur atau "stok tinggal sedikit" untuk menekan pembeli | Tidak ada. Stok tidak pernah ditampilkan ke pelanggan (BR-05) |
+| Font Inter, Poppins, atau font dekoratif | Font sistem (6.2) |
+| Mode gelap | Mode terang saja |
+| Marker Leaflet bawaan biru (ikonnya juga sering rusak di Vite) | `CircleMarker` radius 10, isi `brand`, garis putih 3px untuk titik tujuan. Depo: `CircleMarker` radius 7, isi `surface`, garis `brand` 2px |
+| Tile peta bergaya gelap atau warna-warni | Tile OpenStreetMap standar dengan atribusi |
+
+### 6.2 Token desain
+
+Pakai hanya nilai ini. Jangan memakai palet bawaan Tailwind (`amber-500`, `orange-600`, `indigo-500`, dan sejenisnya) secara langsung. Daftarkan di `tailwind.config` dengan nama di bawah.
+
+Warna diambil dari Mockup Desain TelurFarm v3, ditambah `brand-hover`, `soft`, `edge`, dan `gray` supaya kontras terpenuhi.
+
+| Token | Hex | Dipakai untuk |
 |---|---|---|
-| `brand` | `#704529` | Tombol utama, navigasi aktif, judul |
+| `brand` | `#704529` | Tombol utama, navigasi aktif, judul halaman, marker tujuan |
+| `brand-hover` | `#5A3720` | Tombol utama saat ditekan |
 | `cream` | `#FAF5EB` | Latar halaman |
-| `shell` | `#E4CCAC` | Aksen ringan, latar kartu varian |
-| `yolk` | `#F3BF38` | Pilihan aktif, badge "Baru", pengingat |
-| `white` | `#FFFFFF` | Kartu, formulir |
+| `surface` | `#FFFFFF` | Kartu, formulir, tabel, bar bawah |
+| `soft` | `#F3E8D8` | Latar kartu depo terpilih, baris tabel saat disentuh |
+| `shell` | `#E4CCAC` | Badge "Diproses" saja |
+| `yolk` | `#F3BF38` | Badge "Baru" dan titik penanda jumlah keranjang saja |
 | `ink` | `#33251B` | Teks utama |
-| `muted` | `#806D5D` | Teks pendukung |
-| `line` | `#EBDDCC` | Garis batas |
-| `danger` | `#B3261E` | Pesan error |
-| `ok` | `#2E6B3F` | Status Selesai |
+| `muted` | `#806D5D` | Label field, keterangan, waktu |
+| `line` | `#EBDDCC` | Border kartu dan pemisah (dekoratif) |
+| `edge` | `#94806C` | Border field input, radio, checkbox |
+| `danger` | `#B3261E` | Teks error dan border field yang error saja |
+| `ok` | `#2E6B3F` | Badge "Selesai" saja |
+| `gray` | `#E7E2DC` | Badge "Dibatalkan", tombol nonaktif, kerangka memuat |
 
-Aturan:
-- Mobile-first, lebar desain 360 px. Target sentuh minimal 44 px. Tombol utama menempel di bawah layar pada P1-P4.
-- Label formulir selalu terlihat (bukan placeholder saja). Error tampil di bawah field, warna `danger`, dengan teks persis dari AC.
-- Format uang `Rp24.000` (titik ribuan, tanpa desimal). Format berat `2,5 kg` (koma desimal).
-- Tombol kirim berubah jadi "Mengirim..." dan dinonaktifkan selama proses, cegah ketukan ganda.
-- Badge status: Baru (yolk), Diproses (shell), Dalam pengiriman (brand, teks putih), Selesai (ok, teks putih), Dibatalkan (abu, teks ink).
+- Font: `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`. Harga, berat, jarak, dan kode pesanan memakai `font-variant-numeric: tabular-nums`.
+- Skala ukuran teks: 12, 14, 16, 20, 24px. Teks isi 16px di layar pelanggan, 14px di tabel admin. Judul halaman 20px. Harga di kartu varian 20px tebal.
+- Skala spasi: 4, 8, 12, 16, 24, 32px. Gutter halaman 16px. Jangan memakai nilai di luar skala.
+- Border 1px, radius 8px. Field fokus: border 2px `brand`.
+- Ketebalan font: 400 dan 600 saja.
+
+### 6.3 Tata letak
+
+- Pelanggan: desain untuk lebar 360px, konten maksimal 480px rata tengah di layar lebar. Tanpa sidebar.
+- Header pelanggan 56px: teks "TelurFarm" 20px `brand` tebal di kiri; di kanan link "Lacak pesanan" dan ikon keranjang dengan jumlah kg.
+- Bar bawah P1-P4: menempel di bawah, latar `surface`, satu tombol utama selebar layar setinggi 48px. Konten diberi padding bawah setinggi bar supaya tidak tertutup. Saat keyboard ponsel terbuka, bar ikut naik di atas keyboard (pakai `visualViewport`).
+- Kartu varian (P1): satu kolom, tumpuk vertikal. Nama 16px tebal, deskripsi 14px `muted`, harga 20px tebal, stepper dan tombol "Tambah ke keranjang" dalam satu baris.
+- Kartu depo (P3): satu kolom. Terpilih: border 2px `brand`, latar `soft`, dan teks "Dipilih". Tidak layak: teks `muted`, latar `cream`, alasan di baris kedua. Jangan memakai opacity untuk memudarkan kartu, karena opacity merusak kontras.
+- Satu tombol utama (`brand`, teks putih) per layar. Tombol lain bergaya garis `edge` dengan teks `ink`. Tombol pembatalan bergaya garis dengan teks `danger`.
+- Target sentuh minimal 44x44px, termasuk tombol "-" dan "+" stepper.
+- Admin: di bawah 768px daftar pesanan berbentuk kartu; di 768px ke atas berbentuk tabel dengan header lengket, tinggi baris 48px, teks rata kiri, angka rata kanan. Navigasi admin: tab bawah di ponsel (Pesanan, Stok, plus Harga dan Rekap untuk owner), sidebar 220px di layar lebar.
+- Badge status berbentuk pill, teks 12px tebal, selalu berisi nama status.
+
+| Status | Latar | Teks |
+|---|---|---|
+| Baru | `yolk` | `ink` |
+| Diproses | `shell` | `ink` |
+| Dalam pengiriman | `brand` | putih |
+| Selesai | `ok` | putih |
+| Dibatalkan | `gray` | `ink` |
+
+### 6.4 Keadaan layar
+
+| Keadaan | Tampilan |
+|---|---|
+| Memuat awal katalog | 3 kerangka kartu `gray` setinggi kartu varian, tanpa animasi kilau |
+| Memuat peta | Area peta berlatar `gray` dengan teks "Memuat peta..." di tengah |
+| Memuat daftar depo | Teks "Mencari depo..." di bawah peta; peta tetap bisa digeser |
+| Kosong | Satu kalimat dan satu tombol, rata tengah, tanpa ilustrasi. Contoh: "Keranjang masih kosong" dengan tombol "Pilih telur" |
+| Gagal muat | Pesan di tempat konten dengan tombol "Coba lagi". Isian yang sudah diketik tidak dihapus |
+| Tanpa koneksi | Strip `ink` teks putih di bawah header: "Tidak ada koneksi. Pesanan belum bisa dikirim." Keranjang tetap bisa diubah |
+| Mengirim | Tombol berubah teks "Mengirim..." dan nonaktif; field ikut nonaktif |
+| Galat validasi | Teks `danger` 14px di bawah field terkait dan border field `danger`, bukan dialog. Layar menggulir ke field error pertama |
+| Sukses | Toast 3 detik di atas bar bawah, latar `ink`, teks putih. Toast hanya muncul setelah server mengonfirmasi |
+
+### 6.5 Aksesibilitas
+
+Kontras sudah dihitung dengan rumus WCAG 2.1:
+
+| Pasangan | Rasio | Keputusan |
+|---|---|---|
+| `ink` di `cream` / `surface` | 13,6 / 14,8 | Lolos |
+| `muted` di `surface` | 4,9 | Lolos |
+| `muted` di `cream` | 4,5 | Lolos tipis. Jangan memakai warna yang lebih terang dari `muted` untuk teks |
+| `muted` di `soft` | 4,1 | Tidak lolos. Teks di kartu depo terpilih memakai `ink` |
+| `muted` di `shell` | 3,2 | Tidak lolos. Jangan menaruh teks `muted` di atas `shell` |
+| Putih di `brand` | 8,2 | Lolos |
+| `ink` di `yolk` | 8,7 | Lolos |
+| `yolk` di `surface` | 1,7 | Tidak lolos. `yolk` tidak pernah dipakai sebagai warna teks, ikon, atau satu-satunya penanda pilihan |
+| Putih di `ok` | 6,4 | Lolos |
+| `danger` di `surface` / `cream` | 6,5 / 6,0 | Lolos |
+| `edge` di `surface` / `cream` | 3,8 / 3,5 | Lolos untuk border komponen (minimal 3:1) |
+| `line` di `surface` | 1,3 | Hanya untuk pemisah dekoratif, tidak untuk border field |
+
+- Status dan pilihan tidak boleh dibedakan dengan warna saja. Selalu ada teks ("Dipilih", nama status, alasan).
+- Fokus keyboard: outline 2px `brand` dengan offset 2px.
+- Tombol berisi ikon saja wajib punya `aria-label`: "Keranjang, 3 kg", "Tutup", "Kurangi 0,5 kg", "Tambah 0,5 kg".
+- Field berat memakai `inputmode="decimal"`, nomor WhatsApp `inputmode="tel"`, 4 digit lacak `inputmode="numeric"`.
+- Peta bukan satu-satunya cara: tombol "Pakai lokasi saya" bisa dipakai tanpa menyentuh peta.
+
+### 6.6 Teks UI
+
+Bagian ini satu-satunya yang memakai prinsip stop-slop, karena berlaku untuk tulisan, bukan tampilan.
+
+- Pakai teks persis seperti dalam tanda petik di bagian 8. Jangan menambah tagline, subjudul, atau kalimat sambutan.
+- Bahasa Indonesia sehari-hari yang sopan, sapaan "Anda". Istilah tetap: "depo" (bukan depot, agen, atau toko), "pesanan" (bukan order), "Telur reguler", "Telur pilihan", "Telur ekonomis".
+- Tombol berupa kata kerja yang menyebut hasilnya: "Tambah ke keranjang", "Pilih lokasi antar", "Kirim pesanan", "Proses pesanan", "Mulai antar". Bukan "Lanjut", "Submit", "OK", atau "Klik di sini".
+- Pesan error menyebut masalah dan perbaikannya: "Berat minimal 1 kg". Bukan "Terjadi kesalahan" atau "Input tidak valid".
+- Dilarang kata pemasaran: segar langsung dari kandang, kualitas terbaik, premium, terpercaya, nomor satu, hemat banget, revolusioner, solusi.
+- Tanpa emoji, tanpa tanda seru, tanpa em dash, tanpa huruf kapital semua kecuali kode pesanan.
+- Angka selalu dengan satuan: "3 kg", "Rp72.000", "2,3 km".
+
+### 6.7 Data contoh mode mock
+
+- Satu skenario konsisten: pelanggan Siti Aminah, nomor 0812-3456-7890, Jl. Merdeka No. 12, RT 02/RW 05, Cilegon. Pesanan contoh TF-261019-A7K2 dari Depo Cilegon.
+- Waktu "sekarang" di mock: Senin, 19 Oktober 2026, 09.00 WIB.
+- Stok awal mock: 50 kg tiap varian di tiap depo, kecuali Telur pilihan di Depo Anyer 0 kg, supaya alasan "Stok Telur pilihan tidak cukup" bisa dilihat.
+- Isi 6 pesanan lain di A2 dengan nama dan alamat bergaya Banten (Cilegon, Serang, Anyer) dan status campuran.
+- Dilarang lorem ipsum, "John Doe", "Test 123", nomor telepon yang sama berulang, angka bulat palsu.
+- Angka di A6 dihitung dari data mock, bukan ditulis tangan.
 
 ---
 
@@ -200,7 +316,7 @@ Semua teks dalam tanda petik adalah teks UI persis.
 
 ### 8.2 US-01 Memilih Telur ke Keranjang
 
-Katalog P1 menampilkan kartu per varian aktif: nama, deskripsi singkat, harga "Rp24.000/kg", stepper berat (tombol "-" dan "+" langkah 0,5 kg, plus field angka), tombol "Tambah ke keranjang". Bawah layar: bar "Keranjang 0 kg - Rp0" dan tombol "Lanjut". Data contoh varian:
+Katalog P1 menampilkan kartu per varian aktif: nama, deskripsi singkat, harga "Rp24.000/kg", stepper berat (tombol "-" dan "+" langkah 0,5 kg, plus field angka), tombol "Tambah ke keranjang". Bawah layar: bar "Keranjang 0 kg - Rp0" dan tombol "Lihat keranjang". Data contoh varian:
 
 | id | Nama | Deskripsi |
 |---|---|---|
@@ -237,7 +353,7 @@ P3 bagian atas: peta Leaflet setinggi 50% layar, pin tujuan bisa digeser, tombol
 | AC-02.01 | Happy | Memakai GPS ponsel | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND browser belum pernah ditanya izin lokasi | Saya mengklik tombol "Pakai lokasi saya"<br>AND saya mengklik "Izinkan" di dialog izin lokasi browser | Pin tujuan pindah ke posisi saya<br>AND peta memusat ke pin dengan zoom 16<br>AND daftar depo diperbarui dengan jarak dari pin |
 | AC-02.02 | Negative | Izin lokasi ditolak | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar" | Saya mengklik tombol "Pakai lokasi saya"<br>AND saya mengklik "Blokir" di dialog izin lokasi browser | Muncul teks "Izin lokasi ditolak. Geser pin di peta ke rumah Anda."<br>AND keranjang tidak berubah |
 | AC-02.03 | Happy | Menggeser pin manual | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar" | Saya drag pin tujuan ke titik rumah saya di peta | Daftar depo diperbarui dengan jarak dari titik baru |
-| AC-02.04 | Edge | Lanjut tanpa pernah menentukan titik | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND saya belum memakai GPS dan belum menggeser pin | Saya mengklik tombol "Lanjut isi data" | Muncul teks "Tentukan titik antar dulu: pakai lokasi Anda atau geser pin."<br>AND saya tetap di halaman "Lokasi antar" |
+| AC-02.04 | Edge | Lanjut tanpa pernah menentukan titik | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND saya belum memakai GPS dan belum menggeser pin | Saya mengklik tombol "Isi data pengiriman" | Muncul teks "Tentukan titik antar dulu: pakai lokasi Anda atau geser pin."<br>AND saya tetap di halaman "Lokasi antar" |
 | AC-02.05 | Edge | GPS tidak memberi posisi dalam 10 detik | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND izin lokasi sudah diberikan<br>AND sinyal GPS lemah | Saya mengklik tombol "Pakai lokasi saya" | Setelah 10 detik muncul teks "Lokasi belum ketemu. Geser pin di peta ke rumah Anda." |
 
 Akurasi GPS di atas 100 m ditampilkan sebagai teks "Lokasi kurang akurat (sekitar 250 m). Periksa posisi pin." tanpa memblokir.
@@ -262,8 +378,8 @@ Kartu tidak menampilkan angka stok, hanya cukup atau tidak.
 | AC-ID | Kategori | Skenario | GIVEN | WHEN | THEN |
 |---|---|---|---|---|---|
 | AC-03.02 | Happy | Depo layak terdekat terpilih otomatis | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND Depo Cilegon layak di 2,3 km dan Depo Serang layak di 4,1 km | Saya drag pin tujuan ke titik rumah saya | Kartu Depo Cilegon berada paling atas dengan radio terpilih<br>AND kartu Depo Serang di bawahnya tanpa radio terpilih |
-| AC-03.03 | Happy | Memilih depo layak lain | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND Depo Cilegon terpilih otomatis<br>AND Depo Serang juga layak | Saya mengklik kartu Depo Serang<br>AND saya mengklik tombol "Lanjut isi data" | Sistem membuka halaman "Data pengiriman" dengan ringkasan "Diantar dari Depo Serang" |
-| AC-03.04 | Negative | Tidak ada depo layak | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND titik saya 12 km dari depo terdekat | Saya drag pin tujuan ke titik rumah saya | Muncul teks "Belum ada depo yang bisa mengantar ke lokasi ini dengan isi keranjang sekarang."<br>AND tombol "Lanjut isi data" nonaktif<br>AND muncul tombol "Tanya lewat WhatsApp" |
+| AC-03.03 | Happy | Memilih depo layak lain | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND Depo Cilegon terpilih otomatis<br>AND Depo Serang juga layak | Saya mengklik kartu Depo Serang<br>AND saya mengklik tombol "Isi data pengiriman" | Sistem membuka halaman "Data pengiriman" dengan ringkasan "Diantar dari Depo Serang" |
+| AC-03.04 | Negative | Tidak ada depo layak | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND titik saya 12 km dari depo terdekat | Saya drag pin tujuan ke titik rumah saya | Muncul teks "Belum ada depo yang bisa mengantar ke lokasi ini dengan isi keranjang sekarang."<br>AND tombol "Isi data pengiriman" nonaktif<br>AND muncul tombol "Tanya lewat WhatsApp" |
 | AC-03.05 | Edge | Tanpa sinyal saat memuat depo | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND koneksi internet terputus | Saya drag pin tujuan | Muncul teks "Gagal memuat depo. Periksa koneksi lalu coba lagi."<br>AND muncul tombol "Coba lagi"<br>AND keranjang tidak berubah |
 
 "Tanya lewat WhatsApp" membuka nomor WhatsApp owner (konfigurasi `VITE_OWNER_WA`) dengan teks "Halo TelurFarm, saya mau pesan telur tapi lokasi saya belum terjangkau depo. Lokasi saya: https://maps.google.com/?q={lat},{lng}".
@@ -369,42 +485,42 @@ AC-08.01 Refer to MRTM Rows TRM_STATUS_001 through TRM_STATUS_009.
 |---|---|---|---|---|---|
 | AC-08.02 | Happy | Pesanan baru masuk saat daftar terbuka | Saya seorang Admin depo Cilegon<br>AND saya berada di halaman "Pesanan" tab "Baru" berisi 2 pesanan | Saya menunggu pelanggan mengirim pesanan ke Depo Cilegon | Kartu pesanan baru muncul di tab "Baru" tanpa muat ulang<br>AND jumlah pada tab "Baru" menjadi 3<br>AND muncul notifikasi "Pesanan baru TF-261019-XXXX" |
 | AC-08.03 | Permission | Admin depo hanya melihat depo sendiri | Saya seorang Admin depo Serang<br>AND ada 4 pesanan Depo Cilegon dan 1 pesanan Depo Serang | Saya membuka halaman "Pesanan" tab "Semua" | Daftar hanya berisi 1 pesanan Depo Serang<br>AND dropdown "Depo" tidak ditampilkan |
-| AC-08.04 | Boundary | Nama kurir 51 karakter | Saya seorang Admin depo<br>AND saya berada di halaman "Detail pesanan" berstatus Diproses | Saya mengklik tombol "Mulai antar"<br>AND saya mengetik nama kurir sepanjang 51 karakter<br>AND saya mengklik tombol "Simpan" | Muncul teks "Nama kurir maksimal 50 karakter"<br>AND status tetap Diproses |
+| AC-08.04 | Boundary | Nama kurir 51 karakter | Saya seorang Admin depo<br>AND saya berada di halaman "Detail pesanan" berstatus Diproses | Saya mengklik tombol "Mulai antar"<br>AND saya mengetik nama kurir sepanjang 51 karakter<br>AND saya mengklik tombol "Mulai antar" di dialog | Muncul teks "Nama kurir maksimal 50 karakter"<br>AND status tetap Diproses |
 
 ### 8.10 US-09 Membatalkan Pesanan
 
-Tombol "Batalkan pesanan" hanya ada pada status Baru dan Diproses. Dialog berisi pilihan alasan ("Stok tidak cukup", "Pelanggan membatalkan", "Alamat tidak terjangkau", "Lainnya") dan field "Keterangan" (wajib jika "Lainnya", maks 200 karakter), tombol "Batalkan pesanan" dan "Kembali".
+Tombol "Batalkan pesanan" hanya ada pada status Baru dan Diproses. Dialog berisi pilihan alasan ("Stok tidak cukup", "Pelanggan membatalkan", "Alamat tidak terjangkau", "Lainnya") dan field "Keterangan" (wajib jika "Lainnya", maks 200 karakter), tombol "Batalkan pesanan" dan "Jangan batalkan".
 
 | AC-ID | Kategori | Skenario | GIVEN | WHEN | THEN |
 |---|---|---|---|---|---|
 | AC-09.01 | Happy | Membatalkan pesanan Diproses | Saya seorang Admin depo Cilegon<br>AND saya berada di halaman "Detail pesanan" TF-261019-A7K2 berstatus Diproses berisi Telur reguler 3 kg<br>AND stok Telur reguler Depo Cilegon 10 kg | Saya mengklik tombol "Batalkan pesanan"<br>AND saya memilih alasan "Pelanggan membatalkan"<br>AND saya mengklik tombol "Batalkan pesanan" di dialog | Muncul notifikasi "Pesanan dibatalkan. Stok dikembalikan."<br>AND status menjadi Dibatalkan<br>AND stok Telur reguler Depo Cilegon menjadi 13 kg |
 | AC-09.02 | Negative | Alasan Lainnya tanpa keterangan | Saya seorang Admin depo<br>AND dialog "Batalkan pesanan" terbuka | Saya memilih alasan "Lainnya"<br>AND saya membiarkan field "Keterangan" kosong<br>AND saya mengklik tombol "Batalkan pesanan" di dialog | Muncul teks "Keterangan wajib diisi"<br>AND dialog tetap terbuka<br>AND status tidak berubah |
-| AC-09.03 | Negative | Kembali dari dialog | Saya seorang Admin depo<br>AND dialog "Batalkan pesanan" terbuka | Saya mengklik tombol "Kembali" | Dialog tertutup<br>AND status dan stok tidak berubah |
+| AC-09.03 | Negative | Kembali dari dialog | Saya seorang Admin depo<br>AND dialog "Batalkan pesanan" terbuka | Saya mengklik tombol "Jangan batalkan" | Dialog tertutup<br>AND status dan stok tidak berubah |
 | AC-09.04 | Edge | Pembatalan ganda dari dua perangkat | Saya seorang Admin depo<br>AND pesanan TF-261019-A7K2 sudah dibatalkan dari perangkat lain<br>AND halaman saya masih menampilkan status Diproses | Saya mengklik tombol "Batalkan pesanan"<br>AND saya memilih alasan "Stok tidak cukup"<br>AND saya mengklik tombol "Batalkan pesanan" di dialog | Muncul teks "Status pesanan sudah diubah petugas lain. Muat ulang halaman."<br>AND stok hanya bertambah satu kali (dari pembatalan pertama) |
 
 ### 8.11 US-10 Memperbarui Stok Depo
 
-A4: tabel per varian dengan kolom "Varian", "Stok (kg)", "Diperbarui", field angka dan tombol "Simpan" per baris. Info "Stok berkurang otomatis saat pesanan masuk dan kembali saat pesanan dibatalkan. Isi angka hasil timbang terbaru." Owner memilih depo lewat dropdown.
+A4: tabel per varian dengan kolom "Varian", "Stok (kg)", "Diperbarui", field angka dan tombol "Simpan stok" per baris. Info "Stok berkurang otomatis saat pesanan masuk dan kembali saat pesanan dibatalkan. Isi angka hasil timbang terbaru." Owner memilih depo lewat dropdown.
 
 | AC-ID | Kategori | Skenario | GIVEN | WHEN | THEN |
 |---|---|---|---|---|---|
-| AC-10.01 | Happy | Mengisi stok hasil timbang | Saya seorang Admin depo Cilegon<br>AND saya berada di halaman "Stok depo"<br>AND stok Telur reguler 10 kg | Saya mengetik "45,5" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan" di baris tersebut | Muncul notifikasi "Stok disimpan"<br>AND kolom "Stok (kg)" menampilkan "45,5"<br>AND kolom "Diperbarui" menampilkan jam sekarang dan nama saya |
-| AC-10.02 | Negative | Stok negatif | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "-1" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan" | Muncul teks "Stok tidak boleh kurang dari 0"<br>AND stok tidak berubah |
-| AC-10.03 | Boundary | Stok 0 | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "0" di field stok Telur pilihan<br>AND saya mengklik tombol "Simpan" | Muncul notifikasi "Stok disimpan"<br>AND Depo ini tidak layak untuk keranjang berisi Telur pilihan |
-| AC-10.04 | Boundary | Stok di atas 10.000 kg | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "10000,5" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan" | Muncul teks "Stok maksimal 10.000 kg" |
-| AC-10.05 | Negative | Stok bukan kelipatan 0,5 | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "12,3" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan" | Muncul teks "Stok harus kelipatan 0,5 kg" |
+| AC-10.01 | Happy | Mengisi stok hasil timbang | Saya seorang Admin depo Cilegon<br>AND saya berada di halaman "Stok depo"<br>AND stok Telur reguler 10 kg | Saya mengetik "45,5" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan stok" di baris tersebut | Muncul notifikasi "Stok disimpan"<br>AND kolom "Stok (kg)" menampilkan "45,5"<br>AND kolom "Diperbarui" menampilkan jam sekarang dan nama saya |
+| AC-10.02 | Negative | Stok negatif | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "-1" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan stok" | Muncul teks "Stok tidak boleh kurang dari 0"<br>AND stok tidak berubah |
+| AC-10.03 | Boundary | Stok 0 | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "0" di field stok Telur pilihan<br>AND saya mengklik tombol "Simpan stok" | Muncul notifikasi "Stok disimpan"<br>AND Depo ini tidak layak untuk keranjang berisi Telur pilihan |
+| AC-10.04 | Boundary | Stok di atas 10.000 kg | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "10000,5" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan stok" | Muncul teks "Stok maksimal 10.000 kg" |
+| AC-10.05 | Negative | Stok bukan kelipatan 0,5 | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "12,3" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan stok" | Muncul teks "Stok harus kelipatan 0,5 kg" |
 
 ### 8.12 US-11 Mengatur Harga dan Status Jual
 
-A5: per varian ada field "Harga per kg (Rp)", toggle "Dijual", tombol "Simpan". Info "Harga baru berlaku untuk pesanan berikutnya. Pesanan yang sudah masuk memakai harga lama."
+A5: per varian ada field "Harga per kg (Rp)", toggle "Dijual", tombol "Simpan harga". Info "Harga baru berlaku untuk pesanan berikutnya. Pesanan yang sudah masuk memakai harga lama."
 
 | AC-ID | Kategori | Skenario | GIVEN | WHEN | THEN |
 |---|---|---|---|---|---|
-| AC-11.01 | Happy | Mengubah harga | Saya seorang Owner<br>AND saya berada di halaman "Harga varian"<br>AND harga Telur reguler Rp24.000<br>AND ada pesanan Baru berisi Telur reguler 3 kg senilai Rp72.000 | Saya mengetik "25000" di field "Harga per kg (Rp)" Telur reguler<br>AND saya mengklik tombol "Simpan" | Muncul notifikasi "Harga disimpan"<br>AND katalog menampilkan "Rp25.000/kg"<br>AND pesanan Baru tadi tetap bernilai Rp72.000 |
-| AC-11.02 | Boundary | Harga di bawah Rp1.000 | Saya seorang Owner<br>AND saya berada di halaman "Harga varian" | Saya mengetik "999" di field "Harga per kg (Rp)" Telur ekonomis<br>AND saya mengklik tombol "Simpan" | Muncul teks "Harga harus antara Rp1.000 dan Rp100.000" |
-| AC-11.03 | Boundary | Harga tepat Rp100.000 | Saya seorang Owner<br>AND saya berada di halaman "Harga varian" | Saya mengetik "100000" di field "Harga per kg (Rp)" Telur pilihan<br>AND saya mengklik tombol "Simpan" | Muncul notifikasi "Harga disimpan" |
-| AC-11.04 | Happy | Menonaktifkan varian | Saya seorang Owner<br>AND saya berada di halaman "Harga varian" | Saya mengklik toggle "Dijual" Telur pilihan sampai mati<br>AND saya mengklik tombol "Simpan" | Muncul notifikasi "Harga disimpan"<br>AND kartu Telur pilihan tidak tampil di katalog |
-| AC-11.05 | Negative | Menonaktifkan semua varian | Saya seorang Owner<br>AND saya berada di halaman "Harga varian"<br>AND hanya Telur reguler yang masih dijual | Saya mengklik toggle "Dijual" Telur reguler sampai mati<br>AND saya mengklik tombol "Simpan" | Muncul teks "Minimal satu varian harus dijual"<br>AND Telur reguler tetap dijual |
+| AC-11.01 | Happy | Mengubah harga | Saya seorang Owner<br>AND saya berada di halaman "Harga varian"<br>AND harga Telur reguler Rp24.000<br>AND ada pesanan Baru berisi Telur reguler 3 kg senilai Rp72.000 | Saya mengetik "25000" di field "Harga per kg (Rp)" Telur reguler<br>AND saya mengklik tombol "Simpan harga" | Muncul notifikasi "Harga disimpan"<br>AND katalog menampilkan "Rp25.000/kg"<br>AND pesanan Baru tadi tetap bernilai Rp72.000 |
+| AC-11.02 | Boundary | Harga di bawah Rp1.000 | Saya seorang Owner<br>AND saya berada di halaman "Harga varian" | Saya mengetik "999" di field "Harga per kg (Rp)" Telur ekonomis<br>AND saya mengklik tombol "Simpan harga" | Muncul teks "Harga harus antara Rp1.000 dan Rp100.000" |
+| AC-11.03 | Boundary | Harga tepat Rp100.000 | Saya seorang Owner<br>AND saya berada di halaman "Harga varian" | Saya mengetik "100000" di field "Harga per kg (Rp)" Telur pilihan<br>AND saya mengklik tombol "Simpan harga" | Muncul notifikasi "Harga disimpan" |
+| AC-11.04 | Happy | Menonaktifkan varian | Saya seorang Owner<br>AND saya berada di halaman "Harga varian" | Saya mengklik toggle "Dijual" Telur pilihan sampai mati<br>AND saya mengklik tombol "Simpan harga" | Muncul notifikasi "Harga disimpan"<br>AND kartu Telur pilihan tidak tampil di katalog |
+| AC-11.05 | Negative | Menonaktifkan semua varian | Saya seorang Owner<br>AND saya berada di halaman "Harga varian"<br>AND hanya Telur reguler yang masih dijual | Saya mengklik toggle "Dijual" Telur reguler sampai mati<br>AND saya mengklik tombol "Simpan harga" | Muncul teks "Minimal satu varian harus dijual"<br>AND Telur reguler tetap dijual |
 
 ### 8.13 US-12 Melihat Rekap Pilot
 

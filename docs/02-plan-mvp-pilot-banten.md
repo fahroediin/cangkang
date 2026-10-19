@@ -19,7 +19,7 @@ Selesai jika: semua 6 terjawab dan nilai di spec diperbarui.
 
 ## Tahap 1. Prototipe mode mock di AI Studio
 
-**Masukan:** tempel seluruh `01-spec-mvp-pilot-banten.md`. Lampirkan gambar mockup M02, M03, M04, M05, M06, M08 dari `Mockup-Desain-Web-Mobile-TelurFarm-v3.pdf` sebagai acuan visual.
+**Masukan:** tempel seluruh `01-spec-mvp-pilot-banten.md`. Bagian 6 (tampilan dan teks UI) ikut tertempel; jangan dipotong. Lampirkan gambar mockup M02, M03, M04, M05, M06, M08 dari `Mockup-Desain-Web-Mobile-TelurFarm-v3.pdf` sebagai acuan visual.
 
 **Prompt pembuka:**
 > Bangun aplikasi sesuai dokumen ini. Mulai dengan mode `VITE_DATA_MODE=mock`. Kerjakan alur pelanggan dulu (P1-P6, US-01 sampai US-06). Abaikan bagian 9 kecuali untuk bentuk data dan kode error.
@@ -27,7 +27,7 @@ Selesai jika: semua 6 terjawab dan nilai di spec diperbarui.
 **Lanjutan (prompt kedua, setelah alur pelanggan jalan):**
 > Tambahkan panel petugas A1-A6 (US-07 sampai US-12) di mode mock. Di layar masuk mock, sediakan tombol "Masuk sebagai Owner", "Masuk sebagai Admin Depo Cilegon", "Masuk sebagai Admin Depo Serang".
 
-**Verifikasi manual (oleh Fahrudin):** jalankan AC kategori Happy dan Negative US-01 sampai US-12 di pratinjau AI Studio, layar ponsel 360 px. Catat AC yang gagal, perbaiki dengan prompt yang menyebut AC-ID.
+**Verifikasi manual (oleh Fahrudin):** cek tiap layar terhadap tabel larangan spec 6.1 dan keadaan layar 6.4. Lalu jalankan AC kategori Happy dan Negative US-01 sampai US-12 di pratinjau AI Studio, layar ponsel 360 px. Catat AC yang gagal, perbaiki dengan prompt yang menyebut AC-ID.
 
 Selesai jika: alur pesan dari katalog sampai status Selesai bisa dijalankan di mock, dan teks error sesuai AC.
 
