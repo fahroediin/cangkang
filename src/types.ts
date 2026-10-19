@@ -25,6 +25,8 @@ export interface DepotStock {
   stock_kg: number;
   updated_at: string;
   updated_by?: string | null;
+  // Nama petugas yang terakhir mengisi stok; null = berubah otomatis karena pesanan
+  updated_by_name?: string | null;
 }
 
 export interface DepotCheck {

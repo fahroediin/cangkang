@@ -53,3 +53,10 @@ export function formatTanggalPendek(dateStr: string): string {
   if (parts.length !== 3) return dateStr;
   return `${parseInt(parts[2], 10)} ${INDO_MONTHS_SHORT[parseInt(parts[1], 10) - 1]}`;
 }
+
+// "6285211993344" -> "0852-1199-3344", supaya petugas mudah membaca dan menelepon
+export function formatPhone(phone: string): string {
+  if (!/^628\d+$/.test(phone)) return phone;
+  const local = '0' + phone.slice(2);
+  return [local.slice(0, 4), local.slice(4, 8), local.slice(8)].filter(Boolean).join('-');
+}

@@ -216,7 +216,7 @@ export const AdminOrders: React.FC = () => {
                   <th className="px-4 text-left">Kode</th>
                   <th className="px-4 text-left">Penerima</th>
                   {isOwner && <th className="px-4 text-left">Depo</th>}
-                  <th className="px-4 text-left">Jadwal Antar</th>
+                  <th className="px-4 text-left">Jadwal antar</th>
                   <th className="px-4 text-right">Berat</th>
                   <th className="px-4 text-right">Total</th>
                   <th className="px-4 text-right">Jarak</th>

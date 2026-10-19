@@ -64,7 +64,7 @@ export const AdminLayout: React.FC = () => {
             <span className="text-[20px] font-bold text-brand tracking-tight block">
               TelurFarm
             </span>
-            <span className="text-xs text-muted">Panel Petugas</span>
+            <span className="text-xs text-muted">Panel petugas</span>
           </div>
 
           <div className="p-3 bg-cream border border-line rounded-lg flex flex-col">

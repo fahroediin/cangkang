@@ -136,7 +136,7 @@ export const AdminStock: React.FC = () => {
                   timeZone: 'Asia/Jakarta',
                 }) + ' WIB'
               : '-';
-            const updatedBy = stockRow?.updated_by || '';
+            const updatedBy = stockRow?.updated_by_name || '';
 
             const error = rowErrors[v.id];
 
@@ -150,7 +150,7 @@ export const AdminStock: React.FC = () => {
                     </span>
                     <span>&bull;</span>
                     <span>
-                      Diperbarui: {updatedTime} {updatedBy ? `(${updatedBy})` : ''}
+                      Diperbarui {updatedTime}, {updatedBy ? `oleh ${updatedBy}` : 'otomatis dari pesanan'}
                     </span>
                   </div>
                   {error && <span className="text-xs text-danger font-medium block mt-1">{error}</span>}

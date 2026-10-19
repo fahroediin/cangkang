@@ -265,9 +265,7 @@ export const AdminSummary: React.FC = () => {
           <div className="bg-surface border border-line rounded-lg p-4 flex flex-col">
             <span className="text-xs text-muted">Pelanggan pesan ulang</span>
             <span className="text-2xl font-bold text-ink tabular-nums mt-1">
-              {summary.pelanggan_pesan_ulang > 0
-                ? `${summary.pelanggan_pesan_ulang} (${summary.pelanggan_pesan_ulang_pct}%)`
-                : '0'}
+              {`${summary.pelanggan_pesan_ulang} (${summary.pelanggan_pesan_ulang_pct}%)`}
             </span>
           </div>
 
@@ -284,19 +282,43 @@ export const AdminSummary: React.FC = () => {
       {summary && (
         <div className="bg-surface border border-line rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-cream border-b border-line">
-            <h2 className="text-sm font-semibold text-ink">Rincian Per Depo</h2>
+            <h2 className="text-sm font-semibold text-ink">Rincian per depo</h2>
           </div>
-          <div className="overflow-x-auto">
+          {/* Ponsel: kartu per depo supaya semua angka terlihat tanpa geser ke samping */}
+          <div className="md:hidden divide-y divide-line">
+            {Object.entries(summary.depots_summary).map(([depotId, dSum]) => (
+              <div key={depotId} className="p-4 flex flex-col gap-2">
+                <h3 className="text-sm font-semibold text-ink">{dSum.depot_name}</h3>
+                <dl className="flex flex-col gap-1 text-sm tabular-nums">
+                  {[
+                    ['Selesai', String(dSum.pesanan_selesai)],
+                    ['Kg terjual', formatKg(dSum.kg_terjual)],
+                    ['Rata-rata per pesanan', dSum.avg_kg_per_pesanan !== null ? formatKg(dSum.avg_kg_per_pesanan) : '-'],
+                    ['Pendapatan', formatRupiah(dSum.pendapatan_diterima)],
+                    ['Pelanggan', String(dSum.pelanggan)],
+                    ['Pesan ulang', `${dSum.pelanggan_pesan_ulang} (${dSum.pelanggan_pesan_ulang_pct}%)`],
+                    ['Batal', `${dSum.pembatalan_pct}%`],
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex justify-between gap-2">
+                      <dt className="text-muted">{label}</dt>
+                      <dd className="text-ink font-semibold text-right whitespace-nowrap">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead className="border-b border-line text-muted">
                 <tr className="h-10">
                   <th className="px-4 text-left">Depo</th>
                   <th className="px-4 text-right">Selesai</th>
-                  <th className="px-4 text-right">Kg Terjual</th>
-                  <th className="px-4 text-right">Rata-rata/Order</th>
+                  <th className="px-4 text-right">Kg terjual</th>
+                  <th className="px-4 text-right">Rata-rata per pesanan</th>
                   <th className="px-4 text-right">Pendapatan</th>
                   <th className="px-4 text-right">Pelanggan</th>
-                  <th className="px-4 text-right">Pesan Ulang</th>
+                  <th className="px-4 text-right">Pesan ulang</th>
                   <th className="px-4 text-right">Batal</th>
                 </tr>
               </thead>
@@ -325,10 +347,10 @@ export const AdminSummary: React.FC = () => {
         </div>
       )}
 
-      {/* Kalkulator Titik Impas (US-12, AC-12.02, AC-12.03) */}
+      {/* Kalkulator titik impas (US-12, AC-12.02, AC-12.03) */}
       <div className="bg-surface border border-line rounded-lg p-5 flex flex-col gap-4">
         <div>
-          <h2 className="text-base font-semibold text-ink">Kalkulator Titik Impas</h2>
+          <h2 className="text-base font-semibold text-ink">Kalkulator titik impas</h2>
           <p className="text-xs text-muted">
             Simulasi kelayakan biaya antar gratis dibandingkan penjualan ke tengkulak
           </p>
@@ -363,7 +385,7 @@ export const AdminSummary: React.FC = () => {
         </div>
 
         <div className="p-4 bg-cream rounded-lg border border-line flex flex-col gap-1">
-          <span className="text-xs text-muted">Hasil Perhitungan Titik Impas:</span>
+          <span className="text-xs text-muted">Hasil perhitungan</span>
           <span
             className={`text-base font-bold ${
               breakEvenResult.status === 'loss' ? 'text-danger' : 'text-ink'

@@ -38,7 +38,7 @@ export const AdminLogin: React.FC = () => {
       <div className="max-w-[400px] w-full mx-auto flex flex-col gap-5">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-brand">TelurFarm</h1>
-          <p className="text-sm text-muted mt-1">Panel Masuk Petugas</p>
+          <p className="text-sm text-muted mt-1">Masuk petugas</p>
         </div>
 
         <div className="bg-surface border border-line rounded-lg p-6 flex flex-col gap-4">

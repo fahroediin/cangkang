@@ -4,7 +4,7 @@ import { ArrowLeft, MapPin, MessageCircle, Clock } from 'lucide-react';
 import { Order, Staff, OrderStatus } from '../../types.ts';
 import { dataService } from '../../services/index.ts';
 import { StatusBadge } from '../../components/StatusBadge.tsx';
-import { formatRupiah, formatKg, formatTanggal, formatJarak } from '../../lib/format.ts';
+import { formatRupiah, formatKg, formatTanggal, formatJarak, formatPhone } from '../../lib/format.ts';
 import { buildCustomerWhatsAppLink } from '../../lib/whatsapp.ts';
 import { staffErrorMessage } from '../../lib/errors.ts';
 
@@ -196,7 +196,7 @@ export const AdminOrderDetail: React.FC = () => {
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
-          <span className="text-xs text-muted">Rincian Pesanan</span>
+          <span className="text-xs text-muted">Rincian pesanan</span>
           <h1 className="text-[20px] font-semibold text-ink tabular-nums">{order.code}</h1>
         </div>
       </div>
@@ -229,7 +229,7 @@ export const AdminOrderDetail: React.FC = () => {
           <div className="flex flex-col gap-1 text-sm">
             <span className="text-xs text-muted">Penerima</span>
             <span className="font-semibold text-ink">{order.customer_name}</span>
-            <span className="text-muted tabular-nums">{order.customer_phone}</span>
+            <span className="text-muted tabular-nums">{formatPhone(order.customer_phone)}</span>
 
             <div className="mt-2">
               <a
@@ -245,7 +245,7 @@ export const AdminOrderDetail: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-1 text-sm">
-            <span className="text-xs text-muted">Alamat & Jarak</span>
+            <span className="text-xs text-muted">Alamat dan jarak</span>
             <span className="font-medium text-ink whitespace-pre-wrap">
               {order.address_text}
             </span>
@@ -270,9 +270,9 @@ export const AdminOrderDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Jadwal Antar */}
+        {/* Jadwal antar */}
         <div className="p-3 bg-cream rounded-lg border border-line flex justify-between items-center text-sm">
-          <span className="text-xs text-muted">Jadwal Antar</span>
+          <span className="text-xs text-muted">Jadwal antar</span>
           <span className="font-semibold text-ink">
             {formatTanggal(order.delivery_date, { includeDay: true })}, {slotLabel}
           </span>
@@ -305,11 +305,11 @@ export const AdminOrderDetail: React.FC = () => {
           </div>
 
           <div className="border-t border-line pt-2 flex justify-between items-center text-base font-semibold text-ink">
-            <span>Total Tagihan (Bayar di Tempat)</span>
+            <span>Total tagihan (bayar di tempat)</span>
             <span className="text-[20px] tabular-nums">{formatRupiah(order.total)}</span>
           </div>
           <div className="flex justify-between items-center text-xs text-muted">
-            <span>Status Pembayaran</span>
+            <span>Status pembayaran</span>
             <span className={`font-semibold ${order.is_paid ? 'text-ok' : 'text-muted'}`}>
               {order.is_paid ? 'Sudah diterima' : 'Belum dibayar'}
             </span>
@@ -379,7 +379,7 @@ export const AdminOrderDetail: React.FC = () => {
         <div className="bg-surface border border-line rounded-lg p-5 flex flex-col gap-3">
           <h2 className="text-[16px] font-semibold text-ink flex items-center gap-2">
             <Clock className="w-4 h-4 text-brand" />
-            Riwayat Status
+            Riwayat status
           </h2>
 
           <div className="flex flex-col gap-3 pl-2 border-l-2 border-line ml-2">
@@ -411,7 +411,7 @@ export const AdminOrderDetail: React.FC = () => {
       {showCourierModal && (
         <div className="fixed inset-0 z-50 bg-ink/40 flex items-center justify-center p-4">
           <div className="bg-surface border border-line rounded-lg max-w-sm w-full p-5 flex flex-col gap-4 shadow-[0_4px_12px_rgb(51_37_27/0.12)]">
-            <h3 className="text-base font-semibold text-ink">Mulai Pengantaran</h3>
+            <h3 className="text-base font-semibold text-ink">Mulai antar</h3>
             <div className="flex flex-col gap-1">
               <label htmlFor="modal_courier_name" className="text-xs font-semibold text-ink">
                 Nama kurir
@@ -454,7 +454,7 @@ export const AdminOrderDetail: React.FC = () => {
       {showCompleteModal && (
         <div className="fixed inset-0 z-50 bg-ink/40 flex items-center justify-center p-4">
           <div className="bg-surface border border-line rounded-lg max-w-sm w-full p-5 flex flex-col gap-4 shadow-[0_4px_12px_rgb(51_37_27/0.12)]">
-            <h3 className="text-base font-semibold text-ink">Selesaikan Pesanan</h3>
+            <h3 className="text-base font-semibold text-ink">Tandai selesai</h3>
             <label className="flex items-center gap-2 cursor-pointer text-sm text-ink">
               <input
                 type="checkbox"
@@ -489,7 +489,7 @@ export const AdminOrderDetail: React.FC = () => {
       {showCancelModal && (
         <div className="fixed inset-0 z-50 bg-ink/40 flex items-center justify-center p-4">
           <div className="bg-surface border border-line rounded-lg max-w-md w-full p-5 flex flex-col gap-4 shadow-[0_4px_12px_rgb(51_37_27/0.12)]">
-            <h3 className="text-base font-semibold text-ink">Batalkan Pesanan</h3>
+            <h3 className="text-base font-semibold text-ink">Batalkan pesanan</h3>
 
             <div className="flex flex-col gap-2">
               <span className="text-xs font-semibold text-ink">Pilih alasan pembatalan:</span>

@@ -504,7 +504,7 @@ A4: tabel per varian dengan kolom "Varian", "Stok (kg)", "Diperbarui", field ang
 
 | AC-ID | Kategori | Skenario | GIVEN | WHEN | THEN |
 |---|---|---|---|---|---|
-| AC-10.01 | Happy | Mengisi stok hasil timbang | Saya seorang Admin depo Cilegon<br>AND saya berada di halaman "Stok depo"<br>AND stok Telur reguler 10 kg | Saya mengetik "45,5" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan stok" di baris tersebut | Muncul notifikasi "Stok disimpan"<br>AND kolom "Stok (kg)" menampilkan "45,5"<br>AND kolom "Diperbarui" menampilkan jam sekarang dan nama saya |
+| AC-10.01 | Happy | Mengisi stok hasil timbang | Saya seorang Admin depo Cilegon<br>AND saya berada di halaman "Stok depo"<br>AND stok Telur reguler 10 kg | Saya mengetik "45,5" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan stok" di baris tersebut | Muncul notifikasi "Stok disimpan"<br>AND kolom "Stok (kg)" menampilkan "45,5"<br>AND kolom "Diperbarui" menampilkan jam sekarang dan "oleh {nama saya}" |
 | AC-10.02 | Negative | Stok negatif | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "-1" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan stok" | Muncul teks "Stok tidak boleh kurang dari 0"<br>AND stok tidak berubah |
 | AC-10.03 | Boundary | Stok 0 | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "0" di field stok Telur pilihan<br>AND saya mengklik tombol "Simpan stok" | Muncul notifikasi "Stok disimpan"<br>AND Depo ini tidak layak untuk keranjang berisi Telur pilihan |
 | AC-10.04 | Boundary | Stok di atas 10.000 kg | Saya seorang Admin depo<br>AND saya berada di halaman "Stok depo" | Saya mengetik "10000,5" di field stok Telur reguler<br>AND saya mengklik tombol "Simpan stok" | Muncul teks "Stok maksimal 10.000 kg" |
@@ -597,6 +597,7 @@ create table depot_stock (
     check (stock_kg >= 0 and stock_kg <= 10000 and stock_kg * 2 = trunc(stock_kg * 2)),
   updated_at timestamptz not null default now(),
   updated_by uuid references auth.users(id),
+  updated_by_name text, -- nama petugas; null = berubah otomatis karena pesanan dibuat atau dibatalkan
   primary key (depot_id, variant_id)
 );
 
@@ -796,7 +797,7 @@ begin
     if not found then raise exception 'ERR_VARIANT'; end if;
 
     update depot_stock
-       set stock_kg = stock_kg - v_qty, updated_at = now(), updated_by = null
+       set stock_kg = stock_kg - v_qty, updated_at = now(), updated_by = null, updated_by_name = null
      where depot_id = v_depot.id and variant_id = v_variant.id and stock_kg >= v_qty;
     if not found then raise exception 'ERR_STOCK'; end if;
 
@@ -835,8 +836,8 @@ Semua `security definer`, `set search_path = public, extensions` (di Supabase, p
 |---|---|---|---|---|
 | `check_depots(p_lat, p_lng, p_items jsonb)` | anon | titik + `[{variant_id, qty_kg}]` | baris per depo: `id, name, address, distance_km, radius_km, eligible, reason` | `reason` salah satu `closed`, `out_of_range`, `stock:<variant_name>`, atau null. Prioritas closed > out_of_range > stock. Tidak mengembalikan angka stok. Urut: eligible dulu, lalu jarak |
 | `track_order(p_code, p_last4)` | anon | kode (trim, upper), 4 digit | jsonb pesanan + items + events + depot name/wa, atau null | Cocok jika `right(customer_phone, 4) = p_last4`. Tidak mengembalikan nomor lengkap |
-| `set_order_status(p_order_id, p_expected_status, p_to_status, p_courier_name, p_cancel_reason, p_is_paid)` | authenticated staf | sesuai nama | jsonb pesanan terbaru | Staf harus owner atau admin depo pesanan itu. `update ... where id = p_order_id and status = p_expected_status`; 0 baris -> `ERR_STALE`. Transisi valid: baru->diproses, diproses->dikirim (courier 1-50 karakter), dikirim->selesai, baru->dibatalkan, diproses->dibatalkan (alasan wajib). Pembatalan menambah stok tiap item dalam transaksi yang sama. Tulis `order_events` dengan `actor = auth.uid()` |
-| `set_stock(p_depot_id, p_variant_id, p_stock_kg)` | authenticated staf | sesuai nama | baris stok | Owner semua depo, admin depo hanya depo sendiri. Validasi BR-16. Isi `updated_by` |
+| `set_order_status(p_order_id, p_expected_status, p_to_status, p_courier_name, p_cancel_reason, p_is_paid)` | authenticated staf | sesuai nama | jsonb pesanan terbaru | Staf harus owner atau admin depo pesanan itu. `update ... where id = p_order_id and status = p_expected_status`; 0 baris -> `ERR_STALE`. Transisi valid: baru->diproses, diproses->dikirim (courier 1-50 karakter), dikirim->selesai, baru->dibatalkan, diproses->dibatalkan (alasan wajib). Pembatalan menambah stok tiap item dalam transaksi yang sama, dengan `updated_by_name = null`. Tulis `order_events` dengan `actor = auth.uid()` |
+| `set_stock(p_depot_id, p_variant_id, p_stock_kg)` | authenticated staf | sesuai nama | baris stok | Owner semua depo, admin depo hanya depo sendiri. Validasi BR-16. Isi `updated_by = auth.uid()` dan `updated_by_name` dari `staff.full_name`. Klien membaca `updated_by_name`, bukan UUID |
 | `pilot_summary(p_date_from, p_date_to, p_depot_id null)` | owner | periode | jsonb angka bagian 8.13 total dan per depo, plus `avg_price_per_kg` | Tolak jika bukan owner. Filter `delivery_date` |
 
 ### 9.7 RLS

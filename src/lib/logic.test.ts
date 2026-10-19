@@ -7,7 +7,7 @@ import {
   validateStockKg,
   validatePricePerKg,
 } from './validate.ts';
-import { formatRupiah, formatKg, formatJarak, formatTanggal, formatTanggalPendek } from './format.ts';
+import { formatRupiah, formatKg, formatJarak, formatTanggal, formatTanggalPendek, formatPhone } from './format.ts';
 import { getErrorMessage, ORDER_NOT_SENT_MESSAGE } from './errors.ts';
 import { distanceKm } from './distance.ts';
 import { getAvailableDatesAndSlots, validateSlotSelection } from './slots.ts';
@@ -163,4 +163,12 @@ test('getErrorMessage memetakan kode server dan menyembunyikan pesan teknis', ()
 test('formatTanggalPendek untuk pilihan tanggal antar', () => {
   assert.equal(formatTanggalPendek('2026-10-20'), '20 Okt');
   assert.equal(formatTanggalPendek('2026-01-01'), '1 Jan');
+});
+
+test('formatPhone menampilkan nomor 628... sebagai 08xx-xxxx-xxxx', () => {
+  assert.equal(formatPhone('6285211993344'), '0852-1199-3344');
+  assert.equal(formatPhone('6281234567890'), '0812-3456-7890');
+  assert.equal(formatPhone('62812345678'), '0812-3456-78');
+  // Bukan format 628: tampilkan apa adanya
+  assert.equal(formatPhone('12345'), '12345');
 });

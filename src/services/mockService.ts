@@ -140,7 +140,7 @@ export class MockDataService implements DataService {
             variant_id: v.id,
             stock_kg: qty,
             updated_at: '2026-10-19T07:30:00+07:00',
-            updated_by: 'system',
+            updated_by_name: null,
           });
         }
       }
@@ -537,14 +537,14 @@ export class MockDataService implements DataService {
     if (index >= 0) {
       stocks[index].stock_kg = stockKg;
       stocks[index].updated_at = nowIso;
-      stocks[index].updated_by = staff ? staff.full_name : 'Staff';
+      stocks[index].updated_by_name = staff ? staff.full_name : null;
     } else {
       stocks.push({
         depot_id: depotId,
         variant_id: variantId,
         stock_kg: stockKg,
         updated_at: nowIso,
-        updated_by: staff ? staff.full_name : 'Staff',
+        updated_by_name: staff ? staff.full_name : null,
       });
     }
 
@@ -709,6 +709,7 @@ export class MockDataService implements DataService {
       if (stockRow) {
         stockRow.stock_kg -= item.qty_kg;
         stockRow.updated_at = new Date().toISOString();
+        stockRow.updated_by_name = null;
       }
     }
     localStorage.setItem(STORAGE_KEYS.STOCK, JSON.stringify(stocks));
@@ -943,7 +944,7 @@ export class MockDataService implements DataService {
           if (sRow) {
             sRow.stock_kg += item.qty_kg;
             sRow.updated_at = nowIso;
-            sRow.updated_by = staff ? staff.full_name : 'System';
+            sRow.updated_by_name = null;
           }
         }
         localStorage.setItem(STORAGE_KEYS.STOCK, JSON.stringify(stocks));
