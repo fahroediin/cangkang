@@ -1,0 +1,383 @@
+import React, { useEffect, useState, useCallback } from 'react';
+import { PilotSummary, Depot } from '../../types.ts';
+import { dataService } from '../../services/index.ts';
+import { formatRupiah, formatKg } from '../../lib/format.ts';
+
+export const AdminSummary: React.FC = () => {
+  const [periodType, setPeriodType] = useState<'7d' | '30d' | 'custom'>('7d');
+  const [dateFrom, setDateFrom] = useState<string>('2026-10-13');
+  const [dateTo, setDateTo] = useState<string>('2026-10-20');
+  const [depots, setDepots] = useState<Depot[]>([]);
+  const [selectedDepotId, setSelectedDepotId] = useState<string>('semua');
+  const [summary, setSummary] = useState<PilotSummary | null>(null);
+  const [dateError, setDateError] = useState<string | null>(null);
+
+  // Kalkulator titik impas state
+  const [deliveryCostInput, setDeliveryCostInput] = useState<string>('8000');
+  const [tengkulakPriceInput, setTengkulakPriceInput] = useState<string>('22000');
+
+  // Compute dates based on periodType
+  const updateDatesForPreset = (preset: '7d' | '30d') => {
+    // Benchmark mock reference date is 2026-10-19
+    const baseDate = new Date('2026-10-19T23:59:59+07:00');
+    const toStr = baseDate.toISOString().slice(0, 10);
+
+    const fromDate = new Date(baseDate);
+    fromDate.setDate(baseDate.getDate() - (preset === '7d' ? 6 : 29));
+    const fromStr = fromDate.toISOString().slice(0, 10);
+
+    setDateFrom(fromStr);
+    setDateTo(toStr);
+  };
+
+  const loadSummary = useCallback(async (from: string, to: string, depotId?: string) => {
+    if (to < from) {
+      setDateError('Tanggal sampai harus sama atau setelah tanggal dari');
+      return;
+    }
+    setDateError(null);
+
+    const filterDepot = depotId && depotId !== 'semua' ? depotId : undefined;
+    const data = await dataService.getPilotSummary(from, to, filterDepot);
+    setSummary(data);
+  }, []);
+
+  useEffect(() => {
+    dataService.getDepots().then(setDepots);
+    updateDatesForPreset('7d');
+    loadSummary('2026-10-13', '2026-10-20', 'semua');
+  }, [loadSummary]);
+
+  const handlePeriodChange = (type: '7d' | '30d' | 'custom') => {
+    setPeriodType(type);
+    if (type === '7d' || type === '30d') {
+      updateDatesForPreset(type);
+      const baseDate = new Date('2026-10-19T23:59:59+07:00');
+      const toStr = baseDate.toISOString().slice(0, 10);
+      const fromDate = new Date(baseDate);
+      fromDate.setDate(baseDate.getDate() - (type === '7d' ? 6 : 29));
+      const fromStr = fromDate.toISOString().slice(0, 10);
+      loadSummary(fromStr, toStr, selectedDepotId);
+    }
+  };
+
+  const handleCustomDateSubmit = () => {
+    loadSummary(dateFrom, dateTo, selectedDepotId);
+  };
+
+  const handleDepotChange = (depotId: string) => {
+    setSelectedDepotId(depotId);
+    loadSummary(dateFrom, dateTo, depotId);
+  };
+
+  // Titik Impas Calculation (Spec Section 1.2 & 8.13)
+  const deliveryCost = parseFloat(deliveryCostInput) || 0;
+  const tengkulakPrice = parseFloat(tengkulakPriceInput) || 0;
+  const avgSellingPrice = summary ? summary.avg_price_per_kg : 24000;
+  const actualAvgKg = summary && summary.avg_kg_per_pesanan !== null ? summary.avg_kg_per_pesanan : 0;
+
+  let breakEvenResult: {
+    status: 'ok' | 'loss';
+    text: string;
+    subtext?: string;
+  };
+
+  if (tengkulakPrice >= avgSellingPrice) {
+    breakEvenResult = {
+      status: 'loss',
+      text: 'Harga jual langsung tidak lebih tinggi dari harga tengkulak. Antar gratis selalu rugi.',
+    };
+  } else {
+    const marginPerKg = avgSellingPrice - tengkulakPrice;
+    const breakEvenKg = Math.round((deliveryCost / marginPerKg) * 10) / 10;
+    const isAbove = actualAvgKg >= breakEvenKg;
+
+    breakEvenResult = {
+      status: 'ok',
+      text: `Titik impas: ${breakEvenKg.toFixed(1).replace('.', ',')} kg per pesanan`,
+      subtext: isAbove ? 'Di atas titik impas' : 'Di bawah titik impas',
+    };
+  }
+
+  return (
+    <div className="flex flex-col gap-5 max-w-4xl">
+      <div>
+        <h1 className="text-[20px] font-semibold text-[#33251B]">Rekap pilot</h1>
+        <p className="text-xs text-[#806D5D]">Evaluasi penjualan langsung dan titik impas antar gratis</p>
+      </div>
+
+      {/* Filter Bar */}
+      <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Preset buttons */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <button
+            type="button"
+            onClick={() => handlePeriodChange('7d')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
+              periodType === '7d'
+                ? 'bg-[#704529] text-white border-[#704529]'
+                : 'border-[#94806C] text-[#33251B] bg-white hover:bg-[#FAF5EB]'
+            }`}
+          >
+            7 hari terakhir
+          </button>
+          <button
+            type="button"
+            onClick={() => handlePeriodChange('30d')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
+              periodType === '30d'
+                ? 'bg-[#704529] text-white border-[#704529]'
+                : 'border-[#94806C] text-[#33251B] bg-white hover:bg-[#FAF5EB]'
+            }`}
+          >
+            30 hari terakhir
+          </button>
+          <button
+            type="button"
+            onClick={() => setPeriodType('custom')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
+              periodType === 'custom'
+                ? 'bg-[#704529] text-white border-[#704529]'
+                : 'border-[#94806C] text-[#33251B] bg-white hover:bg-[#FAF5EB]'
+            }`}
+          >
+            Pilih tanggal
+          </button>
+        </div>
+
+        {/* Depo Dropdown */}
+        <div className="flex items-center gap-2">
+          <label htmlFor="summary_depot" className="text-xs text-[#806D5D]">
+            Depo:
+          </label>
+          <select
+            id="summary_depot"
+            value={selectedDepotId}
+            onChange={(e) => handleDepotChange(e.target.value)}
+            className="h-9 px-2.5 rounded-lg border border-[#94806C] text-xs text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529]"
+          >
+            <option value="semua">Semua depo</option>
+            {depots.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Custom Date Pickers */}
+      {periodType === 'custom' && (
+        <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <label htmlFor="date_from" className="text-xs text-[#806D5D]">
+              Dari:
+            </label>
+            <input
+              id="date_from"
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="h-9 px-2 rounded-lg border border-[#94806C] text-xs text-[#33251B] bg-white"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label htmlFor="date_to" className="text-xs text-[#806D5D]">
+              Sampai:
+            </label>
+            <input
+              id="date_to"
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="h-9 px-2 rounded-lg border border-[#94806C] text-xs text-[#33251B] bg-white"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleCustomDateSubmit}
+            className="h-9 px-4 rounded-lg bg-[#704529] hover:bg-[#5A3720] text-white text-xs font-semibold"
+          >
+            Terapkan
+          </button>
+        </div>
+      )}
+
+      {dateError && (
+        <div className="p-3 bg-[#FAF5EB] border border-[#B3261E] rounded-lg text-xs text-[#B3261E] font-medium">
+          {dateError}
+        </div>
+      )}
+
+      {/* Zero State Notice AC-12.04 */}
+      {summary && summary.pesanan_selesai === 0 && (
+        <div className="p-3 bg-[#FAF5EB] border border-[#EBDDCC] rounded-lg text-sm text-[#806D5D] text-center">
+          Belum ada pesanan selesai di periode ini
+        </div>
+      )}
+
+      {/* Stat Cards - Plain Numbers, no arrows/percentages per 6.1 */}
+      {summary && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-[#806D5D]">Pesanan selesai</span>
+            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+              {summary.pesanan_selesai}
+            </span>
+          </div>
+
+          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-[#806D5D]">Kg terjual</span>
+            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+              {formatKg(summary.kg_terjual)}
+            </span>
+          </div>
+
+          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-[#806D5D]">Rata-rata kg per pesanan</span>
+            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+              {summary.avg_kg_per_pesanan !== null ? formatKg(summary.avg_kg_per_pesanan) : '-'}
+            </span>
+          </div>
+
+          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-[#806D5D]">Pendapatan diterima</span>
+            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+              {formatRupiah(summary.pendapatan_diterima)}
+            </span>
+          </div>
+
+          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-[#806D5D]">Pelanggan</span>
+            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+              {summary.pelanggan}
+            </span>
+          </div>
+
+          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-[#806D5D]">Pelanggan pesan ulang</span>
+            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+              {summary.pelanggan_pesan_ulang > 0
+                ? `${summary.pelanggan_pesan_ulang} (${summary.pelanggan_pesan_ulang_pct}%)`
+                : '0'}
+            </span>
+          </div>
+
+          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col col-span-2 md:col-span-2">
+            <span className="text-xs text-[#806D5D]">Pembatalan</span>
+            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+              {summary.pembatalan_pct}%
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Tabel per Depo */}
+      {summary && (
+        <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg overflow-hidden">
+          <div className="px-4 py-3 bg-[#FAF5EB] border-b border-[#EBDDCC]">
+            <h2 className="text-sm font-semibold text-[#33251B]">Rincian Per Depo</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead className="border-b border-[#EBDDCC] text-[#806D5D]">
+                <tr className="h-10">
+                  <th className="px-4 text-left">Depo</th>
+                  <th className="px-4 text-right">Selesai</th>
+                  <th className="px-4 text-right">Kg Terjual</th>
+                  <th className="px-4 text-right">Rata-rata/Order</th>
+                  <th className="px-4 text-right">Pendapatan</th>
+                  <th className="px-4 text-right">Pelanggan</th>
+                  <th className="px-4 text-right">Pesan Ulang</th>
+                  <th className="px-4 text-right">Batal</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#EBDDCC] text-[#33251B]">
+                {Object.entries(summary.depots_summary).map(([depotId, dSum]) => (
+                  <tr key={depotId} className="h-10">
+                    <td className="px-4 font-semibold">{dSum.depot_name}</td>
+                    <td className="px-4 text-right tabular-nums">{dSum.pesanan_selesai}</td>
+                    <td className="px-4 text-right tabular-nums">{formatKg(dSum.kg_terjual)}</td>
+                    <td className="px-4 text-right tabular-nums">
+                      {dSum.avg_kg_per_pesanan !== null ? formatKg(dSum.avg_kg_per_pesanan) : '-'}
+                    </td>
+                    <td className="px-4 text-right tabular-nums font-semibold">
+                      {formatRupiah(dSum.pendapatan_diterima)}
+                    </td>
+                    <td className="px-4 text-right tabular-nums">{dSum.pelanggan}</td>
+                    <td className="px-4 text-right tabular-nums">
+                      {dSum.pelanggan_pesan_ulang} ({dSum.pelanggan_pesan_ulang_pct}%)
+                    </td>
+                    <td className="px-4 text-right tabular-nums">{dSum.pembatalan_pct}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Kalkulator Titik Impas (US-12, AC-12.02, AC-12.03) */}
+      <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-5 flex flex-col gap-4">
+        <div>
+          <h2 className="text-base font-semibold text-[#33251B]">Kalkulator Titik Impas</h2>
+          <p className="text-xs text-[#806D5D]">
+            Simulasi kelayakan biaya antar gratis dibandingkan penjualan ke tengkulak
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="delivery_cost" className="text-xs font-semibold text-[#33251B]">
+              Biaya antar per pesanan (Rp)
+            </label>
+            <input
+              id="delivery_cost"
+              type="number"
+              value={deliveryCostInput}
+              onChange={(e) => setDeliveryCostInput(e.target.value)}
+              className="h-10 px-3 rounded-lg border border-[#94806C] text-sm text-[#33251B] bg-white tabular-nums focus:outline-none focus:border-2 focus:border-[#704529]"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="tengkulak_price" className="text-xs font-semibold text-[#33251B]">
+              Harga jual ke tengkulak per kg (Rp)
+            </label>
+            <input
+              id="tengkulak_price"
+              type="number"
+              value={tengkulakPriceInput}
+              onChange={(e) => setTengkulakPriceInput(e.target.value)}
+              className="h-10 px-3 rounded-lg border border-[#94806C] text-sm text-[#33251B] bg-white tabular-nums focus:outline-none focus:border-2 focus:border-[#704529]"
+            />
+          </div>
+        </div>
+
+        <div className="p-4 bg-[#FAF5EB] rounded-lg border border-[#EBDDCC] flex flex-col gap-1">
+          <span className="text-xs text-[#806D5D]">Hasil Perhitungan Titik Impas:</span>
+          <span
+            className={`text-base font-bold ${
+              breakEvenResult.status === 'loss' ? 'text-[#B3261E]' : 'text-[#33251B]'
+            }`}
+          >
+            {breakEvenResult.text}
+          </span>
+          {breakEvenResult.subtext && (
+            <span
+              className={`text-xs font-semibold ${
+                breakEvenResult.subtext === 'Di atas titik impas'
+                  ? 'text-[#2E6B3F]'
+                  : 'text-[#B3261E]'
+              }`}
+            >
+              {breakEvenResult.subtext} (Rata-rata pesanan: {formatKg(actualAvgKg)})
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};

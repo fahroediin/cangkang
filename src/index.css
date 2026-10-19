@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #704529;
+  --color-brand-hover: #5A3720;
+  --color-cream: #FAF5EB;
+  --color-surface: #FFFFFF;
+  --color-soft: #F3E8D8;
+  --color-shell: #E4CCAC;
+  --color-yolk: #F3BF38;
+  --color-ink: #33251B;
+  --color-muted: #806D5D;
+  --color-line: #EBDDCC;
+  --color-edge: #94806C;
+  --color-danger: #B3261E;
+  --color-ok: #2E6B3F;
+  --color-gray: #E7E2DC;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background-color: #FAF5EB;
+  color: #33251B;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom leaflet tweaks to prevent tile overflow and match design */
+.leaflet-container {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+  z-index: 10;
+}

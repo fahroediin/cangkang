@@ -1,0 +1,6 @@
+{
+  "name": "TelurFarm",
+  "description": "Layanan pesan-antar telur segar langsung dari peternak di Banten dengan gratis ongkir.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
