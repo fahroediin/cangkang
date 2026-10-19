@@ -1,0 +1,14 @@
+# Dokumen sumber asli (docx, xlsx, pdf, zip) tidak di-commit
+docs/sumber/
+*.docx
+*.xlsx
+*.pdf
+*.zip
+
+# Umum
+node_modules/
+dist/
+.env
+.env.*
+.DS_Store
+Thumbs.db
