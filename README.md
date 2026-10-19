@@ -16,6 +16,8 @@ Nama diambil dari identitas visual di dokumen mockup: palet "cangkang telur cokl
 | Path | Isi |
 |---|---|
 | `docs/00-ringkasan-sumber.md` | Rangkuman semua dokumen sumber, status aplikasi v3.1, dan celah yang perlu diputuskan |
+| `docs/01-spec-mvp-pilot-banten.md` | Spec mandiri MVP pesan-antar untuk ditempel ke Google AI Studio: US/AC, aturan bisnis, skema dan RPC Supabase |
+| `docs/02-plan-mvp-pilot-banten.md` | Plan tahap 0-5: konfirmasi pemilik, prototipe mock, Supabase, sambung, rilis, evaluasi |
 | `docs/sumber/` | Tempat dokumen asli (diabaikan git, lihat `.gitignore`) |
 
 ## Dokumen sumber
@@ -30,4 +32,4 @@ Disimpan di luar repo, `Downloads/TelurFarm/`:
 
 ## Status
 
-Belum ada kode di repo ini. Langkah berikutnya ditentukan setelah celah di `docs/00-ringkasan-sumber.md` bagian "Yang perlu diputuskan" dijawab.
+Lingkup dipilih 2026-10-19: MVP pesan-antar untuk pilot Banten, bukan melanjutkan v3.1. Belum ada kode. Langkah berikutnya: Tahap 0 di plan, konfirmasi asumsi ke pemilik.
