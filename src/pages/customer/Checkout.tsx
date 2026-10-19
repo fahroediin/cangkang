@@ -4,7 +4,7 @@ import { Variant } from '../../types.ts';
 import { dataService } from '../../services/index.ts';
 import { Header } from '../../components/Header.tsx';
 import { BottomBar } from '../../components/BottomBar.tsx';
-import { formatRupiah, formatKg } from '../../lib/format.ts';
+import { formatRupiah, formatKg, formatTanggalPendek } from '../../lib/format.ts';
 import { normalizePhone } from '../../lib/validate.ts';
 import { getAvailableDatesAndSlots } from '../../lib/slots.ts';
 import { getErrorMessage } from '../../lib/errors.ts';
@@ -120,8 +120,10 @@ export const Checkout: React.FC = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      // Scroll to first error
-      window.scrollTo({ top: 150, behavior: 'smooth' });
+      // Gulir ke field error pertama (spec 6.4)
+      const firstField = (['name', 'phone', 'address', 'slot'] as const).find((k) => newErrors[k]);
+      const fieldId = { name: 'customer_name', phone: 'customer_phone', address: 'customer_address', slot: 'slot_group' }[firstField!];
+      document.getElementById(fieldId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
@@ -145,7 +147,7 @@ export const Checkout: React.FC = () => {
 
       // Success
       clearCart();
-      saveLastOrder(res.code);
+      saveLastOrder(res.code, normalizedPhone.slice(-4));
       navigate(`/pesanan/${res.code}`);
     } catch (err: any) {
       setIsSubmitting(false);
@@ -169,32 +171,28 @@ export const Checkout: React.FC = () => {
         });
       } else {
         // AC-04.12: Connection error or general
-        setErrors({
-          general:
-            getErrorMessage(msg) ||
-            'Pesanan belum terkirim. Periksa koneksi lalu tekan Kirim pesanan lagi.',
-        });
+        setErrors({ general: getErrorMessage(msg) });
       }
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF5EB] flex flex-col pb-28">
+    <div className="min-h-screen bg-cream flex flex-col pb-28">
       <Header />
 
       <main className="max-w-[480px] w-full mx-auto px-4 py-4 flex flex-col gap-4">
-        <h1 className="text-[20px] font-semibold text-[#33251B]">Data pengiriman</h1>
+        <h1 className="text-[20px] font-semibold text-ink">Data pengiriman</h1>
 
         {/* Ringkasan pesanan & Depo */}
-        <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col gap-3">
-          <div className="flex items-center justify-between pb-2 border-b border-[#EBDDCC]">
-            <span className="text-sm font-semibold text-[#33251B]">
+        <div className="bg-surface border border-line rounded-lg p-4 flex flex-col gap-3">
+          <div className="flex items-center justify-between pb-2 border-b border-line">
+            <span className="text-sm font-semibold text-ink">
               Diantar dari {checkoutState.depot_name || 'Depo'}
             </span>
-            <span className="text-xs text-[#2E6B3F] font-semibold">Ongkir Rp0</span>
+            <span className="text-xs text-ok font-semibold">Ongkir Rp0</span>
           </div>
 
-          <div className="flex flex-col gap-1 text-sm text-[#33251B]">
+          <div className="flex flex-col gap-1 text-sm text-ink">
             {cart.map((item) => {
               const v = variantMap.get(item.variant_id);
               const name = v ? v.name : item.variant_id;
@@ -212,25 +210,25 @@ export const Checkout: React.FC = () => {
             })}
           </div>
 
-          <div className="border-t border-[#EBDDCC] pt-2 flex justify-between items-center">
-            <span className="text-sm font-semibold text-[#33251B]">Total ({formatKg(totalKg)})</span>
-            <span className="text-lg font-semibold text-[#33251B] tabular-nums">
+          <div className="border-t border-line pt-2 flex justify-between items-center">
+            <span className="text-sm font-semibold text-ink">Total ({formatKg(totalKg)})</span>
+            <span className="text-lg font-semibold text-ink tabular-nums">
               {formatRupiah(totalPrice)}
             </span>
           </div>
         </div>
 
         {/* Form fields */}
-        <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col gap-4">
+        <div className="bg-surface border border-line rounded-lg p-4 flex flex-col gap-4">
           {/* General error / Stock error banner */}
           {errors.general && (
-            <div className="p-3 bg-[#FAF5EB] border border-[#B3261E] rounded-lg text-sm text-[#B3261E] flex flex-col gap-2">
+            <div className="p-3 bg-cream border border-danger rounded-lg text-sm text-danger flex flex-col gap-2">
               <p>{errors.general}</p>
               {errors.stockError && (
                 <button
                   type="button"
                   onClick={() => navigate('/lokasi')}
-                  className="self-start px-3 py-1 bg-[#FFFFFF] border border-[#94806C] rounded text-xs text-[#33251B] font-semibold"
+                  className="self-start px-3 py-1 bg-surface border border-edge rounded text-xs text-ink font-semibold"
                 >
                   Pilih depo lagi
                 </button>
@@ -240,7 +238,7 @@ export const Checkout: React.FC = () => {
 
           {/* Nama penerima */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="customer_name" className="text-sm font-semibold text-[#33251B]">
+            <label htmlFor="customer_name" className="text-sm font-semibold text-ink">
               Nama penerima
             </label>
             <input
@@ -249,16 +247,16 @@ export const Checkout: React.FC = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={isSubmitting}
-              className={`h-11 px-3 rounded-lg border text-sm text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529] ${
-                errors.name ? 'border-[#B3261E]' : 'border-[#94806C]'
+              className={`h-11 px-3 rounded-lg border text-sm text-ink bg-white focus:outline-none focus:border-2 focus:border-brand ${
+                errors.name ? 'border-danger' : 'border-edge'
               }`}
             />
-            {errors.name && <span className="text-xs text-[#B3261E] font-medium">{errors.name}</span>}
+            {errors.name && <span className="text-xs text-danger font-medium">{errors.name}</span>}
           </div>
 
           {/* Nomor WhatsApp */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="customer_phone" className="text-sm font-semibold text-[#33251B]">
+            <label htmlFor="customer_phone" className="text-sm font-semibold text-ink">
               Nomor WhatsApp
             </label>
             <input
@@ -269,16 +267,16 @@ export const Checkout: React.FC = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               disabled={isSubmitting}
-              className={`h-11 px-3 rounded-lg border text-sm text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529] ${
-                errors.phone ? 'border-[#B3261E]' : 'border-[#94806C]'
+              className={`h-11 px-3 rounded-lg border text-sm text-ink bg-white focus:outline-none focus:border-2 focus:border-brand ${
+                errors.phone ? 'border-danger' : 'border-edge'
               }`}
             />
-            {errors.phone && <span className="text-xs text-[#B3261E] font-medium">{errors.phone}</span>}
+            {errors.phone && <span className="text-xs text-danger font-medium">{errors.phone}</span>}
           </div>
 
           {/* Alamat lengkap */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="customer_address" className="text-sm font-semibold text-[#33251B]">
+            <label htmlFor="customer_address" className="text-sm font-semibold text-ink">
               Alamat lengkap
             </label>
             <textarea
@@ -288,18 +286,18 @@ export const Checkout: React.FC = () => {
               onChange={(e) => setAddress(e.target.value)}
               disabled={isSubmitting}
               placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan"
-              className={`p-3 rounded-lg border text-sm text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529] ${
-                errors.address ? 'border-[#B3261E]' : 'border-[#94806C]'
+              className={`p-3 rounded-lg border text-sm text-ink bg-white focus:outline-none focus:border-2 focus:border-brand ${
+                errors.address ? 'border-danger' : 'border-edge'
               }`}
             />
             {errors.address && (
-              <span className="text-xs text-[#B3261E] font-medium">{errors.address}</span>
+              <span className="text-xs text-danger font-medium">{errors.address}</span>
             )}
           </div>
 
           {/* Patokan (opsional) */}
           <div className="flex flex-col gap-1">
-            <label htmlFor="customer_note" className="text-sm font-semibold text-[#33251B]">
+            <label htmlFor="customer_note" className="text-sm font-semibold text-ink">
               Patokan (opsional)
             </label>
             <input
@@ -309,13 +307,13 @@ export const Checkout: React.FC = () => {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               disabled={isSubmitting}
-              className="h-11 px-3 rounded-lg border border-[#94806C] text-sm text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529]"
+              className="h-11 px-3 rounded-lg border border-edge text-sm text-ink bg-white focus:outline-none focus:border-2 focus:border-brand"
             />
           </div>
 
           {/* Tanggal antar */}
           <div className="flex flex-col gap-2 pt-1">
-            <span className="text-sm font-semibold text-[#33251B]">Tanggal antar</span>
+            <span className="text-sm font-semibold text-ink">Tanggal antar</span>
             <div className="grid grid-cols-3 gap-2">
               {dates.map((d) => (
                 <button
@@ -330,24 +328,22 @@ export const Checkout: React.FC = () => {
                   }}
                   className={`p-2.5 rounded-lg border text-center transition-colors flex flex-col items-center justify-center ${
                     !d.isAvailable
-                      ? 'bg-[#E7E2DC] text-[#806D5D] border-[#EBDDCC] cursor-not-allowed opacity-60'
+                      ? 'bg-gray text-ink border-gray cursor-not-allowed'
                       : selectedDateKey === d.key
-                      ? 'bg-[#F3E8D8] border-2 border-[#704529] text-[#33251B] font-semibold'
-                      : 'bg-[#FFFFFF] border-[#94806C] text-[#33251B] hover:bg-[#FAF5EB]'
+                      ? 'bg-soft border-2 border-brand text-ink font-semibold'
+                      : 'bg-surface border-edge text-ink hover:bg-cream'
                   }`}
                 >
-                  <span className="text-xs font-semibold">{d.label}</span>
-                  <span className="text-[11px] text-[#806D5D] mt-0.5">
-                    {d.dateStr.slice(5).replace('-', '/')}
-                  </span>
+                  <span className="text-sm font-semibold">{d.label}</span>
+                  <span className="text-xs mt-0.5">{formatTanggalPendek(d.dateStr)}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Jam antar */}
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-semibold text-[#33251B]">Jam antar</span>
+          <div id="slot_group" className="flex flex-col gap-2">
+            <span className="text-sm font-semibold text-ink">Jam antar</span>
             <div className="grid grid-cols-2 gap-2">
               {currentDateObj.slots.map((s) => (
                 <button
@@ -357,29 +353,29 @@ export const Checkout: React.FC = () => {
                   onClick={() => setSelectedSlotKey(s.key)}
                   className={`p-3 rounded-lg border text-left transition-colors flex flex-col ${
                     !s.isAvailable
-                      ? 'bg-[#E7E2DC] border-[#EBDDCC] text-[#806D5D] cursor-not-allowed opacity-60'
+                      ? 'bg-gray border-gray text-ink cursor-not-allowed'
                       : selectedSlotKey === s.key
-                      ? 'bg-[#F3E8D8] border-2 border-[#704529] text-[#33251B] font-semibold'
-                      : 'bg-[#FFFFFF] border-[#94806C] text-[#33251B] hover:bg-[#FAF5EB]'
+                      ? 'bg-soft border-2 border-brand text-ink font-semibold'
+                      : 'bg-surface border-edge text-ink hover:bg-cream'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold">{s.label}</span>
                     {s.disabledReason && (
-                      <span className="text-[11px] font-semibold text-[#B3261E]">
+                      <span className="text-xs font-semibold text-ink">
                         {s.disabledReason}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-[#806D5D] mt-0.5">{s.sublabel}</span>
+                  <span className="text-xs mt-0.5">{s.sublabel}</span>
                 </button>
               ))}
             </div>
-            {errors.slot && <span className="text-xs text-[#B3261E] font-medium">{errors.slot}</span>}
+            {errors.slot && <span className="text-xs text-danger font-medium">{errors.slot}</span>}
           </div>
 
           {/* Fixed payment text */}
-          <div className="p-3 bg-[#FAF5EB] border border-[#EBDDCC] rounded-lg text-xs text-[#33251B]">
+          <div className="p-3 bg-cream border border-line rounded-lg text-xs text-ink">
             Pembayaran: bayar di tempat saat telur diterima (tunai atau QRIS)
           </div>
         </div>

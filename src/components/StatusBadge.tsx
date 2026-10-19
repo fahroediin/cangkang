@@ -9,31 +9,31 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   switch (status) {
     case 'baru':
       return (
-        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F3BF38] text-[#33251B]">
+        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yolk text-ink">
           Baru
         </span>
       );
     case 'diproses':
       return (
-        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E4CCAC] text-[#33251B]">
+        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-shell text-ink">
           Diproses
         </span>
       );
     case 'dikirim':
       return (
-        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#704529] text-white">
+        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand text-white">
           Dalam pengiriman
         </span>
       );
     case 'selesai':
       return (
-        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#2E6B3F] text-white">
+        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-ok text-white">
           Selesai
         </span>
       );
     case 'dibatalkan':
       return (
-        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E7E2DC] text-[#33251B]">
+        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray text-ink">
           Dibatalkan
         </span>
       );

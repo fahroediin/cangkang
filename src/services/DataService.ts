@@ -17,7 +17,6 @@ export interface DataService {
   checkDepots(lat: number, lng: number, items: { variant_id: string; qty_kg: number }[]): Promise<DepotCheck[]>;
   createOrder(params: CreateOrderParams): Promise<CreateOrderResult>;
   trackOrder(code: string, last4: string): Promise<Order | null>;
-  getOrder(code: string): Promise<Order | null>;
 
   // Staff & Auth
   loginStaff(email: string, password: string): Promise<Staff>;

@@ -806,20 +806,6 @@ export class MockDataService implements DataService {
     };
   }
 
-  async getOrder(code: string): Promise<Order | null> {
-    const cleanCode = (code || '').trim().toUpperCase();
-    const orders = await this.getAllOrdersRaw();
-    const found = orders.find((o) => o.code.toUpperCase() === cleanCode);
-    if (!found) return null;
-
-    const depots = await this.getDepots();
-    const depot = depots.find((d) => d.id === found.depot_id);
-    return {
-      ...found,
-      depot_name: depot ? depot.name : undefined,
-      depot_wa: depot ? depot.wa_number : undefined,
-    };
-  }
 
   // --- Staff Auth ---
   async loginStaff(email: string, password: string): Promise<Staff> {

@@ -6,6 +6,7 @@ import { dataService } from '../../services/index.ts';
 import { StatusBadge } from '../../components/StatusBadge.tsx';
 import { formatRupiah, formatKg, formatTanggal, formatJarak } from '../../lib/format.ts';
 import { buildCustomerWhatsAppLink } from '../../lib/whatsapp.ts';
+import { staffErrorMessage } from '../../lib/errors.ts';
 
 export const AdminOrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -66,8 +67,8 @@ export const AdminOrderDetail: React.FC = () => {
       });
       setOrder(updated);
       showToast('Status pesanan diubah ke Diproses');
-    } catch (err: any) {
-      setActionError(err?.message || 'Status pesanan sudah diubah petugas lain. Muat ulang halaman.');
+    } catch (err) {
+      setActionError(staffErrorMessage(err, 'Status pesanan sudah diubah petugas lain. Muat ulang halaman.'));
     }
   };
 
@@ -95,8 +96,8 @@ export const AdminOrderDetail: React.FC = () => {
       setOrder(updated);
       setShowCourierModal(false);
       showToast('Status pesanan diubah ke Dalam pengiriman');
-    } catch (err: any) {
-      setCourierError(err?.message || 'Status pesanan sudah diubah petugas lain. Muat ulang halaman.');
+    } catch (err) {
+      setCourierError(staffErrorMessage(err, 'Status pesanan sudah diubah petugas lain. Muat ulang halaman.'));
     }
   };
 
@@ -113,8 +114,8 @@ export const AdminOrderDetail: React.FC = () => {
       setOrder(updated);
       setShowCompleteModal(false);
       showToast('Status pesanan diubah ke Selesai');
-    } catch (err: any) {
-      setActionError(err?.message || 'Status pesanan sudah diubah petugas lain. Muat ulang halaman.');
+    } catch (err) {
+      setActionError(staffErrorMessage(err, 'Status pesanan sudah diubah petugas lain. Muat ulang halaman.'));
     }
   };
 
@@ -147,24 +148,24 @@ export const AdminOrderDetail: React.FC = () => {
       setOrder(updated);
       setShowCancelModal(false);
       showToast('Pesanan dibatalkan. Stok dikembalikan.');
-    } catch (err: any) {
-      setCancelError(err?.message || 'Status pesanan sudah diubah petugas lain. Muat ulang halaman.');
+    } catch (err) {
+      setCancelError(staffErrorMessage(err, 'Status pesanan sudah diubah petugas lain. Muat ulang halaman.'));
     }
   };
 
   if (loading) {
-    return <div className="text-sm text-[#806D5D]">Memuat rincian pesanan...</div>;
+    return <div className="text-sm text-muted">Memuat rincian pesanan...</div>;
   }
 
   // TRM_STATUS_009: Admin depo Serang buka pesanan Cilegon -> "Pesanan tidak ditemukan"
   if (!order) {
     return (
-      <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-8 text-center flex flex-col items-center gap-3">
-        <p className="text-base text-[#806D5D]">Pesanan tidak ditemukan</p>
+      <div className="bg-surface border border-line rounded-lg p-8 text-center flex flex-col items-center gap-3">
+        <p className="text-base text-muted">Pesanan tidak ditemukan</p>
         <button
           type="button"
           onClick={() => navigate('/admin')}
-          className="px-4 py-2 bg-[#704529] text-white font-semibold text-sm rounded-lg"
+          className="px-4 py-2 bg-brand text-white font-semibold text-sm rounded-lg"
         >
           Kembali ke daftar pesanan
         </button>
@@ -180,7 +181,7 @@ export const AdminOrderDetail: React.FC = () => {
     <div className="flex flex-col gap-5 max-w-3xl">
       {/* Toast */}
       {toastMessage && (
-        <div className="fixed top-16 right-4 z-50 bg-[#33251B] text-white text-sm px-4 py-3 rounded-lg shadow-lg border border-[#EBDDCC]">
+        <div className="fixed top-16 right-4 z-50 bg-ink text-white text-sm px-4 py-3 rounded-lg shadow-[0_4px_12px_rgb(51_37_27/0.12)] border border-line">
           {toastMessage}
         </div>
       )}
@@ -190,34 +191,34 @@ export const AdminOrderDetail: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate('/admin')}
-          className="p-2 rounded-lg border border-[#94806C] text-[#33251B] hover:bg-[#FAF5EB]"
+          className="p-2 rounded-lg border border-edge text-ink hover:bg-cream"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
-          <span className="text-xs text-[#806D5D]">Rincian Pesanan</span>
-          <h1 className="text-[20px] font-semibold text-[#33251B] tabular-nums">{order.code}</h1>
+          <span className="text-xs text-muted">Rincian Pesanan</span>
+          <h1 className="text-[20px] font-semibold text-ink tabular-nums">{order.code}</h1>
         </div>
       </div>
 
       {actionError && (
-        <div className="p-3 bg-[#FAF5EB] border border-[#B3261E] rounded-lg text-sm text-[#B3261E] font-medium">
+        <div className="p-3 bg-cream border border-danger rounded-lg text-sm text-danger font-medium">
           {actionError}
         </div>
       )}
 
       {/* Main Order Card */}
-      <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-5 flex flex-col gap-4">
-        <div className="flex items-start justify-between pb-3 border-b border-[#EBDDCC]">
+      <div className="bg-surface border border-line rounded-lg p-5 flex flex-col gap-4">
+        <div className="flex items-start justify-between pb-3 border-b border-line">
           <div>
-            <span className="text-xs text-[#806D5D]">Depo</span>
-            <div className="text-sm font-semibold text-[#33251B]">{order.depot_name}</div>
+            <span className="text-xs text-muted">Depo</span>
+            <div className="text-sm font-semibold text-ink">{order.depot_name}</div>
           </div>
           <StatusBadge status={order.status} />
         </div>
 
         {order.status === 'dibatalkan' && order.cancel_reason && (
-          <div className="p-3 bg-[#FAF5EB] border border-[#EBDDCC] rounded-lg text-sm text-[#33251B]">
+          <div className="p-3 bg-cream border border-line rounded-lg text-sm text-ink">
             <span className="font-semibold">Alasan pembatalan: </span>
             {order.cancel_reason}
           </div>
@@ -226,32 +227,32 @@ export const AdminOrderDetail: React.FC = () => {
         {/* Customer & Address Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1 text-sm">
-            <span className="text-xs text-[#806D5D]">Penerima</span>
-            <span className="font-semibold text-[#33251B]">{order.customer_name}</span>
-            <span className="text-[#806D5D] tabular-nums">{order.customer_phone}</span>
+            <span className="text-xs text-muted">Penerima</span>
+            <span className="font-semibold text-ink">{order.customer_name}</span>
+            <span className="text-muted tabular-nums">{order.customer_phone}</span>
 
             <div className="mt-2">
               <a
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#94806C] text-xs font-semibold text-[#33251B] hover:bg-[#FAF5EB]"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-edge text-xs font-semibold text-ink hover:bg-cream"
               >
-                <MessageCircle className="w-4 h-4 text-[#2E6B3F]" />
+                <MessageCircle className="w-4 h-4 text-ok" />
                 Chat pelanggan
               </a>
             </div>
           </div>
 
           <div className="flex flex-col gap-1 text-sm">
-            <span className="text-xs text-[#806D5D]">Alamat & Jarak</span>
-            <span className="font-medium text-[#33251B] whitespace-pre-wrap">
+            <span className="text-xs text-muted">Alamat & Jarak</span>
+            <span className="font-medium text-ink whitespace-pre-wrap">
               {order.address_text}
             </span>
             {order.address_note && (
-              <span className="text-xs text-[#806D5D]">Patokan: {order.address_note}</span>
+              <span className="text-xs text-muted">Patokan: {order.address_note}</span>
             )}
-            <span className="text-xs text-[#806D5D] tabular-nums mt-0.5">
+            <span className="text-xs text-muted tabular-nums mt-0.5">
               Jarak garis lurus: {formatJarak(order.distance_km)}
             </span>
 
@@ -260,9 +261,9 @@ export const AdminOrderDetail: React.FC = () => {
                 href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#94806C] text-xs font-semibold text-[#33251B] hover:bg-[#FAF5EB]"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-edge text-xs font-semibold text-ink hover:bg-cream"
               >
-                <MapPin className="w-4 h-4 text-[#704529]" />
+                <MapPin className="w-4 h-4 text-brand" />
                 Buka di Google Maps
               </a>
             </div>
@@ -270,66 +271,66 @@ export const AdminOrderDetail: React.FC = () => {
         </div>
 
         {/* Jadwal Antar */}
-        <div className="p-3 bg-[#FAF5EB] rounded-lg border border-[#EBDDCC] flex justify-between items-center text-sm">
-          <span className="text-xs text-[#806D5D]">Jadwal Antar</span>
-          <span className="font-semibold text-[#33251B]">
+        <div className="p-3 bg-cream rounded-lg border border-line flex justify-between items-center text-sm">
+          <span className="text-xs text-muted">Jadwal Antar</span>
+          <span className="font-semibold text-ink">
             {formatTanggal(order.delivery_date, { includeDay: true })}, {slotLabel}
           </span>
         </div>
 
         {order.courier_name && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-xs text-[#806D5D]">Kurir pengantar</span>
-            <span className="font-semibold text-[#33251B]">{order.courier_name}</span>
+            <span className="text-xs text-muted">Kurir pengantar</span>
+            <span className="font-semibold text-ink">{order.courier_name}</span>
           </div>
         )}
 
         {/* Barang Belanja */}
-        <div className="flex flex-col gap-2 pt-2 border-t border-[#EBDDCC]">
-          <span className="text-xs text-[#806D5D] font-semibold">Barang yang dipesan</span>
-          <div className="flex flex-col divide-y divide-[#EBDDCC] text-sm">
+        <div className="flex flex-col gap-2 pt-2 border-t border-line">
+          <span className="text-xs text-muted font-semibold">Barang yang dipesan</span>
+          <div className="flex flex-col divide-y divide-line text-sm">
             {(order.items || []).map((item) => (
               <div key={item.variant_id} className="py-2 flex justify-between items-center">
                 <div>
-                  <span className="font-semibold text-[#33251B]">{item.variant_name}</span>
-                  <span className="text-xs text-[#806D5D] ml-2 tabular-nums">
+                  <span className="font-semibold text-ink">{item.variant_name}</span>
+                  <span className="text-xs text-muted ml-2 tabular-nums">
                     {formatKg(item.qty_kg)} @ {formatRupiah(item.price_per_kg)}
                   </span>
                 </div>
-                <span className="font-semibold text-[#33251B] tabular-nums">
+                <span className="font-semibold text-ink tabular-nums">
                   {formatRupiah(item.line_total)}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="border-t border-[#EBDDCC] pt-2 flex justify-between items-center text-base font-semibold text-[#33251B]">
+          <div className="border-t border-line pt-2 flex justify-between items-center text-base font-semibold text-ink">
             <span>Total Tagihan (Bayar di Tempat)</span>
             <span className="text-[20px] tabular-nums">{formatRupiah(order.total)}</span>
           </div>
-          <div className="flex justify-between items-center text-xs text-[#806D5D]">
+          <div className="flex justify-between items-center text-xs text-muted">
             <span>Status Pembayaran</span>
-            <span className={`font-semibold ${order.is_paid ? 'text-[#2E6B3F]' : 'text-[#806D5D]'}`}>
+            <span className={`font-semibold ${order.is_paid ? 'text-ok' : 'text-muted'}`}>
               {order.is_paid ? 'Sudah diterima' : 'Belum dibayar'}
             </span>
           </div>
         </div>
 
         {/* Action Buttons strictly following TRM_STATUS rules */}
-        <div className="flex flex-wrap gap-2 pt-4 border-t border-[#EBDDCC]">
+        <div className="flex flex-wrap gap-2 pt-4 border-t border-line">
           {order.status === 'baru' && (
             <>
               <button
                 type="button"
                 onClick={handleProcessOrder}
-                className="h-11 px-5 rounded-lg bg-[#704529] hover:bg-[#5A3720] text-white font-semibold text-sm transition-colors"
+                className="h-11 px-5 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition-colors"
               >
                 Proses pesanan
               </button>
               <button
                 type="button"
                 onClick={() => setShowCancelModal(true)}
-                className="h-11 px-4 rounded-lg border border-[#B3261E] text-[#B3261E] font-semibold text-sm hover:bg-[#FAF5EB] transition-colors"
+                className="h-11 px-4 rounded-lg border border-danger text-danger font-semibold text-sm hover:bg-cream transition-colors"
               >
                 Batalkan pesanan
               </button>
@@ -345,14 +346,14 @@ export const AdminOrderDetail: React.FC = () => {
                   setCourierError(null);
                   setShowCourierModal(true);
                 }}
-                className="h-11 px-5 rounded-lg bg-[#704529] hover:bg-[#5A3720] text-white font-semibold text-sm transition-colors"
+                className="h-11 px-5 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition-colors"
               >
                 Mulai antar
               </button>
               <button
                 type="button"
                 onClick={() => setShowCancelModal(true)}
-                className="h-11 px-4 rounded-lg border border-[#B3261E] text-[#B3261E] font-semibold text-sm hover:bg-[#FAF5EB] transition-colors"
+                className="h-11 px-4 rounded-lg border border-danger text-danger font-semibold text-sm hover:bg-cream transition-colors"
               >
                 Batalkan pesanan
               </button>
@@ -363,7 +364,7 @@ export const AdminOrderDetail: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowCompleteModal(true)}
-              className="h-11 px-5 rounded-lg bg-[#2E6B3F] hover:bg-[#255733] text-white font-semibold text-sm transition-colors"
+              className="h-11 px-5 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition-colors"
             >
               Tandai selesai
             </button>
@@ -375,13 +376,13 @@ export const AdminOrderDetail: React.FC = () => {
 
       {/* Timeline Riwayat Status */}
       {order.events && order.events.length > 0 && (
-        <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-5 flex flex-col gap-3">
-          <h2 className="text-[16px] font-semibold text-[#33251B] flex items-center gap-2">
-            <Clock className="w-4 h-4 text-[#704529]" />
+        <div className="bg-surface border border-line rounded-lg p-5 flex flex-col gap-3">
+          <h2 className="text-[16px] font-semibold text-ink flex items-center gap-2">
+            <Clock className="w-4 h-4 text-brand" />
             Riwayat Status
           </h2>
 
-          <div className="flex flex-col gap-3 pl-2 border-l-2 border-[#EBDDCC] ml-2">
+          <div className="flex flex-col gap-3 pl-2 border-l-2 border-line ml-2">
             {order.events.map((ev) => {
               const d = new Date(ev.created_at);
               const timeFormatted = d.toLocaleString('id-ID', {
@@ -391,11 +392,11 @@ export const AdminOrderDetail: React.FC = () => {
               });
               return (
                 <div key={ev.id} className="relative pl-3 flex flex-col">
-                  <span className="text-sm font-semibold text-[#33251B] capitalize">
+                  <span className="text-sm font-semibold text-ink capitalize">
                     {ev.to_status === 'dikirim' ? 'Dalam pengiriman' : ev.to_status}
                   </span>
-                  <span className="text-xs text-[#806D5D]">{ev.note}</span>
-                  <div className="text-[11px] text-[#806D5D] mt-0.5 tabular-nums">
+                  <span className="text-xs text-muted">{ev.note}</span>
+                  <div className="text-xs text-muted mt-0.5 tabular-nums">
                     <span>{timeFormatted} WIB</span>
                     {ev.actor && <span className="ml-2 font-medium">oleh {ev.actor}</span>}
                   </div>
@@ -408,11 +409,11 @@ export const AdminOrderDetail: React.FC = () => {
 
       {/* Courier Modal (Mulai Antar) */}
       {showCourierModal && (
-        <div className="fixed inset-0 z-50 bg-[#33251B]/40 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg max-w-sm w-full p-5 flex flex-col gap-4 shadow-lg">
-            <h3 className="text-base font-semibold text-[#33251B]">Mulai Pengantaran</h3>
+        <div className="fixed inset-0 z-50 bg-ink/40 flex items-center justify-center p-4">
+          <div className="bg-surface border border-line rounded-lg max-w-sm w-full p-5 flex flex-col gap-4 shadow-[0_4px_12px_rgb(51_37_27/0.12)]">
+            <h3 className="text-base font-semibold text-ink">Mulai Pengantaran</h3>
             <div className="flex flex-col gap-1">
-              <label htmlFor="modal_courier_name" className="text-xs font-semibold text-[#33251B]">
+              <label htmlFor="modal_courier_name" className="text-xs font-semibold text-ink">
                 Nama kurir
               </label>
               <input
@@ -422,10 +423,10 @@ export const AdminOrderDetail: React.FC = () => {
                 placeholder="Contoh: Budi Santoso"
                 value={courierName}
                 onChange={(e) => setCourierName(e.target.value)}
-                className="h-11 px-3 rounded-lg border border-[#94806C] text-sm text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529]"
+                className="h-11 px-3 rounded-lg border border-edge text-sm text-ink bg-white focus:outline-none focus:border-2 focus:border-brand"
               />
               {courierError && (
-                <span className="text-xs text-[#B3261E] font-medium">{courierError}</span>
+                <span className="text-xs text-danger font-medium">{courierError}</span>
               )}
             </div>
 
@@ -433,14 +434,14 @@ export const AdminOrderDetail: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowCourierModal(false)}
-                className="h-10 px-4 rounded-lg border border-[#94806C] text-sm text-[#33251B] font-semibold"
+                className="h-11 px-4 rounded-lg border border-edge text-sm text-ink font-semibold"
               >
                 Batal
               </button>
               <button
                 type="button"
                 onClick={handleStartDelivery}
-                className="h-10 px-4 rounded-lg bg-[#704529] hover:bg-[#5A3720] text-sm text-white font-semibold"
+                className="h-11 px-4 rounded-lg bg-brand hover:bg-brand-hover text-sm text-white font-semibold"
               >
                 Mulai antar
               </button>
@@ -451,15 +452,15 @@ export const AdminOrderDetail: React.FC = () => {
 
       {/* Complete Modal (Tandai Selesai) */}
       {showCompleteModal && (
-        <div className="fixed inset-0 z-50 bg-[#33251B]/40 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg max-w-sm w-full p-5 flex flex-col gap-4 shadow-lg">
-            <h3 className="text-base font-semibold text-[#33251B]">Selesaikan Pesanan</h3>
-            <label className="flex items-center gap-2 cursor-pointer text-sm text-[#33251B]">
+        <div className="fixed inset-0 z-50 bg-ink/40 flex items-center justify-center p-4">
+          <div className="bg-surface border border-line rounded-lg max-w-sm w-full p-5 flex flex-col gap-4 shadow-[0_4px_12px_rgb(51_37_27/0.12)]">
+            <h3 className="text-base font-semibold text-ink">Selesaikan Pesanan</h3>
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-ink">
               <input
                 type="checkbox"
                 checked={isPaidChecked}
                 onChange={(e) => setIsPaidChecked(e.target.checked)}
-                className="w-4 h-4 accent-[#704529]"
+                className="w-4 h-4 accent-brand"
               />
               <span>Pembayaran sudah diterima</span>
             </label>
@@ -468,14 +469,14 @@ export const AdminOrderDetail: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowCompleteModal(false)}
-                className="h-10 px-4 rounded-lg border border-[#94806C] text-sm text-[#33251B] font-semibold"
+                className="h-11 px-4 rounded-lg border border-edge text-sm text-ink font-semibold"
               >
                 Batal
               </button>
               <button
                 type="button"
                 onClick={handleCompleteOrder}
-                className="h-10 px-4 rounded-lg bg-[#2E6B3F] hover:bg-[#255733] text-sm text-white font-semibold"
+                className="h-11 px-4 rounded-lg bg-brand hover:bg-brand-hover text-sm text-white font-semibold"
               >
                 Tandai selesai
               </button>
@@ -486,25 +487,25 @@ export const AdminOrderDetail: React.FC = () => {
 
       {/* Cancel Modal (US-09) */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 bg-[#33251B]/40 flex items-center justify-center p-4">
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg max-w-md w-full p-5 flex flex-col gap-4 shadow-lg">
-            <h3 className="text-base font-semibold text-[#33251B]">Batalkan Pesanan</h3>
+        <div className="fixed inset-0 z-50 bg-ink/40 flex items-center justify-center p-4">
+          <div className="bg-surface border border-line rounded-lg max-w-md w-full p-5 flex flex-col gap-4 shadow-[0_4px_12px_rgb(51_37_27/0.12)]">
+            <h3 className="text-base font-semibold text-ink">Batalkan Pesanan</h3>
 
             <div className="flex flex-col gap-2">
-              <span className="text-xs font-semibold text-[#33251B]">Pilih alasan pembatalan:</span>
+              <span className="text-xs font-semibold text-ink">Pilih alasan pembatalan:</span>
               {[
                 'Stok tidak cukup',
                 'Pelanggan membatalkan',
                 'Alamat tidak terjangkau',
                 'Lainnya',
               ].map((opt) => (
-                <label key={opt} className="flex items-center gap-2 text-sm text-[#33251B] cursor-pointer">
+                <label key={opt} className="flex items-center gap-2 text-sm text-ink cursor-pointer">
                   <input
                     type="radio"
                     name="cancel_reason"
                     checked={cancelReasonOption === opt}
                     onChange={() => setCancelReasonOption(opt)}
-                    className="w-4 h-4 accent-[#704529]"
+                    className="w-4 h-4 accent-brand"
                   />
                   <span>{opt}</span>
                 </label>
@@ -513,7 +514,7 @@ export const AdminOrderDetail: React.FC = () => {
 
             {cancelReasonOption === 'Lainnya' && (
               <div className="flex flex-col gap-1">
-                <label htmlFor="cancel_keterangan" className="text-xs font-semibold text-[#33251B]">
+                <label htmlFor="cancel_keterangan" className="text-xs font-semibold text-ink">
                   Keterangan
                 </label>
                 <input
@@ -523,27 +524,27 @@ export const AdminOrderDetail: React.FC = () => {
                   placeholder="Tuliskan alasan pembatalan..."
                   value={cancelNote}
                   onChange={(e) => setCancelNote(e.target.value)}
-                  className="h-11 px-3 rounded-lg border border-[#94806C] text-sm text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529]"
+                  className="h-11 px-3 rounded-lg border border-edge text-sm text-ink bg-white focus:outline-none focus:border-2 focus:border-brand"
                 />
               </div>
             )}
 
             {cancelError && (
-              <span className="text-xs text-[#B3261E] font-medium">{cancelError}</span>
+              <span className="text-xs text-danger font-medium">{cancelError}</span>
             )}
 
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setShowCancelModal(false)}
-                className="h-10 px-4 rounded-lg border border-[#94806C] text-sm text-[#33251B] font-semibold"
+                className="h-11 px-4 rounded-lg border border-edge text-sm text-ink font-semibold"
               >
                 Jangan batalkan
               </button>
               <button
                 type="button"
                 onClick={handleCancelOrder}
-                className="h-10 px-4 rounded-lg bg-[#B3261E] hover:bg-[#8F1E18] text-sm text-white font-semibold"
+                className="h-11 px-4 rounded-lg border border-edge bg-surface hover:bg-cream text-sm text-danger font-semibold"
               >
                 Batalkan pesanan
               </button>

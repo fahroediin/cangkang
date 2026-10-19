@@ -91,7 +91,7 @@ export const LocationPage: React.FC = () => {
   const handleProceed = () => {
     // AC-02.04: Lanjut tanpa pernah menentukan titik
     if (!selectedLat || !selectedLng) {
-      setValidationError('Tentukan titik antar dulu: pakai lokasi Anda atau geser pin.');
+      setValidationError('Tentukan titik antar dulu: pakai lokasi Anda atau ketuk peta.');
       return;
     }
 
@@ -117,10 +117,12 @@ export const LocationPage: React.FC = () => {
 
   const eligibleCount = depotChecks.filter((d) => d.eligible).length;
 
-  const renderReason = (reason: string | null) => {
+  const renderReason = (reason: string | null, distanceKm: number, radiusKm: number) => {
     if (!reason) return '';
     if (reason === 'closed') return 'Depo sedang tutup';
-    if (reason === 'out_of_range') return 'Di luar jangkauan antar (5 km)';
+    if (reason === 'out_of_range') {
+      return `Di luar jangkauan antar (${formatJarak(distanceKm)}, batas ${formatJarak(radiusKm).replace(',0 km', ' km')})`;
+    }
     if (reason.startsWith('stock:')) {
       const vName = reason.replace('stock:', '');
       return `Stok ${vName} tidak cukup`;
@@ -129,11 +131,11 @@ export const LocationPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF5EB] flex flex-col pb-28">
+    <div className="min-h-screen bg-cream flex flex-col pb-28">
       <Header />
 
       <main className="max-w-[480px] w-full mx-auto px-4 py-4 flex flex-col gap-4">
-        <h1 className="text-[20px] font-semibold text-[#33251B]">Lokasi antar dan pilih depo</h1>
+        <h1 className="text-[20px] font-semibold text-ink">Lokasi antar dan pilih depo</h1>
 
         {/* Map Picker (US-02) */}
         <MapPicker
@@ -146,12 +148,12 @@ export const LocationPage: React.FC = () => {
         {/* Depots list (US-03) */}
         <div className="flex flex-col gap-3 pt-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-[16px] font-semibold text-[#33251B]">Pilih depo terdekat</h2>
-            {loadingDepots && <span className="text-xs text-[#806D5D]">Mencari depo...</span>}
+            <h2 className="text-[16px] font-semibold text-ink">Pilih depo terdekat</h2>
+            {loadingDepots && <span className="text-xs text-muted">Mencari depo...</span>}
           </div>
 
           {fetchError && (
-            <div className="p-3 bg-[#FFFFFF] border border-[#B3261E] rounded-lg text-sm text-[#B3261E] flex flex-col gap-2">
+            <div className="p-3 bg-surface border border-danger rounded-lg text-sm text-danger flex flex-col gap-2">
               <p>Gagal memuat depo. Periksa koneksi lalu coba lagi.</p>
               <button
                 type="button"
@@ -160,7 +162,7 @@ export const LocationPage: React.FC = () => {
                     runCheckDepots(selectedLat, selectedLng, selectedDepotId);
                   }
                 }}
-                className="self-start px-3 py-1 bg-[#FAF5EB] border border-[#94806C] rounded text-xs text-[#33251B] font-semibold"
+                className="self-start px-3 py-1 bg-cream border border-edge rounded text-xs text-ink font-semibold"
               >
                 Coba lagi
               </button>
@@ -168,25 +170,27 @@ export const LocationPage: React.FC = () => {
           )}
 
           {!selectedLat && !fetchError && (
-            <div className="p-4 bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg text-sm text-[#806D5D] text-center">
+            <div className="p-4 bg-surface border border-line rounded-lg text-sm text-muted text-center">
               Tentukan titik antar di peta untuk melihat depo yang menjangkau lokasi Anda.
             </div>
           )}
 
           {selectedLat !== null && selectedLng !== null && !loadingDepots && !fetchError && depotChecks.length > 0 && eligibleCount === 0 && (
-            <div className="p-4 bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg flex flex-col gap-3 text-center">
-              <p className="text-sm text-[#33251B]">
+            <div className="p-4 bg-surface border border-line rounded-lg flex flex-col gap-3 text-center">
+              <p className="text-sm text-ink">
                 Belum ada depo yang bisa mengantar ke lokasi ini dengan isi keranjang sekarang.
               </p>
+              {config.ownerWa && (
               <a
                 href={buildOwnerOutOfRangeWhatsAppLink(config.ownerWa, selectedLat, selectedLng)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 h-11 px-4 rounded-lg border border-[#94806C] text-sm font-semibold text-[#33251B] hover:bg-[#FAF5EB]"
+                className="inline-flex items-center justify-center gap-2 h-11 px-4 rounded-lg border border-edge text-sm font-semibold text-ink hover:bg-cream"
               >
-                <MessageCircle className="w-4 h-4 text-[#2E6B3F]" />
+                <MessageCircle className="w-4 h-4 text-ok" />
                 Tanya lewat WhatsApp
               </a>
+              )}
             </div>
           )}
 
@@ -200,8 +204,8 @@ export const LocationPage: React.FC = () => {
                   onClick={() => handleDepotSelect(depot)}
                   className={`p-4 rounded-lg cursor-pointer transition-colors flex items-start gap-3 ${
                     isSelected
-                      ? 'bg-[#F3E8D8] border-2 border-[#704529]'
-                      : 'bg-[#FFFFFF] border border-[#EBDDCC] hover:bg-[#FAF5EB]'
+                      ? 'bg-soft border-2 border-brand'
+                      : 'bg-surface border border-line hover:bg-cream'
                   }`}
                 >
                   <input
@@ -209,20 +213,20 @@ export const LocationPage: React.FC = () => {
                     name="selected_depot"
                     checked={isSelected}
                     onChange={() => handleDepotSelect(depot)}
-                    className="mt-1 w-4 h-4 accent-[#704529]"
+                    className="mt-1 w-4 h-4 accent-brand"
                   />
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-[#33251B]">{depot.name}</h3>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[#FAF5EB] text-[#2E6B3F] border border-[#EBDDCC]">
+                      <h3 className="text-sm font-semibold text-ink">{depot.name}</h3>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded bg-cream text-ok border border-line">
                         Gratis ongkir
                       </span>
                     </div>
-                    <p className="text-xs text-[#806D5D] mt-0.5">{depot.address}</p>
-                    <div className="flex items-center justify-between mt-2 text-xs font-medium text-[#33251B] tabular-nums">
+                    <p className="text-xs text-muted mt-0.5">{depot.address}</p>
+                    <div className="flex items-center justify-between mt-2 text-xs font-medium text-ink tabular-nums">
                       <span>{formatJarak(depot.distance_km)}</span>
                       {isSelected && (
-                        <span className="text-xs font-semibold text-[#704529]">Dipilih</span>
+                        <span className="text-xs font-semibold text-brand">Dipilih</span>
                       )}
                     </div>
                   </div>
@@ -234,24 +238,24 @@ export const LocationPage: React.FC = () => {
             return (
               <div
                 key={depot.id}
-                className="p-4 rounded-lg bg-[#FAF5EB] border border-[#EBDDCC] flex items-start gap-3 opacity-90"
+                className="p-4 rounded-lg bg-cream border border-line flex items-start gap-3"
               >
                 <input
                   type="radio"
                   disabled
                   checked={false}
-                  className="mt-1 w-4 h-4 accent-[#94806C] cursor-not-allowed"
+                  className="mt-1 w-4 h-4 accent-edge cursor-not-allowed"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-[#806D5D]">{depot.name}</h3>
-                    <span className="text-xs text-[#806D5D] tabular-nums">
+                    <h3 className="text-sm font-medium text-muted">{depot.name}</h3>
+                    <span className="text-xs text-muted tabular-nums">
                       {formatJarak(depot.distance_km)}
                     </span>
                   </div>
-                  <p className="text-xs text-[#806D5D] mt-0.5">{depot.address}</p>
-                  <p className="text-xs text-[#B3261E] font-medium mt-1">
-                    {renderReason(depot.reason)}
+                  <p className="text-xs text-muted mt-0.5">{depot.address}</p>
+                  <p className="text-xs text-danger font-medium mt-1">
+                    {renderReason(depot.reason, depot.distance_km, depot.radius_km)}
                   </p>
                 </div>
               </div>
@@ -263,7 +267,7 @@ export const LocationPage: React.FC = () => {
       <BottomBar
         buttonText="Isi data pengiriman"
         onClick={handleProceed}
-        disabled={!selectedLat || eligibleCount === 0 || !selectedDepotId}
+        disabled={selectedLat !== null && (loadingDepots || eligibleCount === 0)}
         errorText={validationError || undefined}
       />
     </div>

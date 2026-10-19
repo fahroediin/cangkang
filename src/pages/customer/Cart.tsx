@@ -92,25 +92,25 @@ export const Cart: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF5EB] flex flex-col pb-28">
+    <div className="min-h-screen bg-cream flex flex-col pb-28">
       <Header />
 
       <main className="max-w-[480px] w-full mx-auto px-4 py-4 flex flex-col gap-4">
-        <h1 className="text-[20px] font-semibold text-[#33251B]">Keranjang</h1>
+        <h1 className="text-[20px] font-semibold text-ink">Keranjang</h1>
 
         {notice && (
-          <div className="p-3 bg-[#F3E8D8] border border-[#EBDDCC] rounded-lg text-sm text-[#33251B]">
+          <div className="p-3 bg-soft border border-line rounded-lg text-sm text-ink">
             {notice}
           </div>
         )}
 
         {cartItems.length === 0 ? (
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-8 flex flex-col items-center justify-center gap-4 text-center my-8">
-            <p className="text-base text-[#806D5D]">Keranjang masih kosong</p>
+          <div className="bg-surface border border-line rounded-lg p-8 flex flex-col items-center justify-center gap-4 text-center my-8">
+            <p className="text-base text-muted">Keranjang masih kosong</p>
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="h-11 px-6 rounded-lg bg-[#704529] hover:bg-[#5A3720] text-white font-semibold text-sm transition-colors"
+              className="h-11 px-6 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition-colors"
             >
               Pilih telur
             </button>
@@ -127,19 +127,19 @@ export const Cart: React.FC = () => {
                 return (
                   <div
                     key={item.variant_id}
-                    className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col gap-3"
+                    className="bg-surface border border-line rounded-lg p-4 flex flex-col gap-3"
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <h2 className="text-[16px] font-semibold text-[#33251B]">{name}</h2>
-                        <p className="text-xs text-[#806D5D] tabular-nums">
+                        <h2 className="text-[16px] font-semibold text-ink">{name}</h2>
+                        <p className="text-xs text-muted tabular-nums">
                           {formatRupiah(pricePerKg)}/kg
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleRemove(item.variant_id)}
-                        className="text-xs text-[#806D5D] hover:text-[#B3261E] flex items-center gap-1 p-1 rounded"
+                        className="text-xs text-muted hover:text-danger flex items-center gap-1 p-1 rounded"
                       >
                         <Trash2 className="w-4 h-4" />
                         <span>Hapus</span>
@@ -154,10 +154,10 @@ export const Cart: React.FC = () => {
                         onDecrement={() => handleDecrement(item.variant_id, item.qty_kg)}
                       />
                       <div className="text-right">
-                        <div className="text-[16px] font-semibold text-[#33251B] tabular-nums">
+                        <div className="text-[16px] font-semibold text-ink tabular-nums">
                           {formatRupiah(lineTotal)}
                         </div>
-                        <div className="text-xs text-[#806D5D] tabular-nums">
+                        <div className="text-xs text-muted tabular-nums">
                           {formatKg(item.qty_kg)}
                         </div>
                       </div>
@@ -168,18 +168,18 @@ export const Cart: React.FC = () => {
             </div>
 
             {/* Price breakdown */}
-            <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col gap-2">
-              <div className="flex justify-between text-sm text-[#806D5D]">
+            <div className="bg-surface border border-line rounded-lg p-4 flex flex-col gap-2">
+              <div className="flex justify-between text-sm text-muted">
                 <span>Total berat</span>
-                <span className="font-semibold text-[#33251B] tabular-nums">
+                <span className="font-semibold text-ink tabular-nums">
                   {formatKg(totalKg)}
                 </span>
               </div>
-              <div className="flex justify-between text-sm text-[#806D5D]">
+              <div className="flex justify-between text-sm text-muted">
                 <span>Ongkos kirim</span>
-                <span className="font-semibold text-[#2E6B3F]">Gratis</span>
+                <span className="font-semibold text-ok">Gratis</span>
               </div>
-              <div className="border-t border-[#EBDDCC] pt-2 flex justify-between text-base font-semibold text-[#33251B]">
+              <div className="border-t border-line pt-2 flex justify-between text-base font-semibold text-ink">
                 <span>Total</span>
                 <span className="text-[20px] tabular-nums">{formatRupiah(totalPrice)}</span>
               </div>

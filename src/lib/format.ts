@@ -46,3 +46,10 @@ export function formatTanggal(dateStr: string, options?: { shortMonth?: boolean;
   }
   return `${day} ${monthName} ${year}`;
 }
+
+// "2026-10-20" -> "20 Okt", untuk tombol pilihan tanggal antar
+export function formatTanggalPendek(dateStr: string): string {
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  return `${parseInt(parts[2], 10)} ${INDO_MONTHS_SHORT[parseInt(parts[1], 10) - 1]}`;
+}

@@ -42,13 +42,13 @@ export const QtyStepper: React.FC<QtyStepperProps> = ({
   };
 
   return (
-    <div className="flex items-center border border-[#94806C] rounded-lg bg-[#FFFFFF] overflow-hidden">
+    <div className="flex items-center border border-edge rounded-lg bg-surface overflow-hidden">
       <button
         type="button"
         aria-label="Kurangi 0,5 kg"
         onClick={handleDecrement}
         disabled={disabled}
-        className="w-11 h-11 flex items-center justify-center text-[#33251B] hover:bg-[#FAF5EB] active:bg-[#F3E8D8] disabled:opacity-40 transition-colors"
+        className="w-11 h-11 flex items-center justify-center text-ink hover:bg-cream active:bg-soft disabled:opacity-40 transition-colors"
       >
         <Minus className="w-4 h-4" />
       </button>
@@ -60,9 +60,9 @@ export const QtyStepper: React.FC<QtyStepperProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="w-14 text-center font-semibold text-base text-[#33251B] tabular-nums bg-transparent focus:outline-none"
+          className="w-14 text-center font-semibold text-base text-ink tabular-nums bg-transparent focus:outline-none"
         />
-        <span className="text-sm font-normal text-[#806D5D]">kg</span>
+        <span className="text-sm font-normal text-muted">kg</span>
       </div>
 
       <button
@@ -70,7 +70,7 @@ export const QtyStepper: React.FC<QtyStepperProps> = ({
         aria-label="Tambah 0,5 kg"
         onClick={handleIncrement}
         disabled={disabled}
-        className="w-11 h-11 flex items-center justify-center text-[#33251B] hover:bg-[#FAF5EB] active:bg-[#F3E8D8] disabled:opacity-40 transition-colors"
+        className="w-11 h-11 flex items-center justify-center text-ink hover:bg-cream active:bg-soft disabled:opacity-40 transition-colors"
       >
         <Plus className="w-4 h-4" />
       </button>

@@ -18,15 +18,25 @@ export const ERROR_MESSAGES: Record<string, string> = {
   ERR_STALE: 'Status pesanan sudah diubah petugas lain. Muat ulang halaman.',
 };
 
+export const ORDER_NOT_SENT_MESSAGE =
+  'Pesanan belum terkirim. Periksa koneksi lalu tekan Kirim pesanan lagi.';
+
+// Pesan Postgres bisa berisi kode di tengah teks. Cocokkan kode terpanjang dulu
+// supaya ERR_NAME_LONG tidak tertangkap sebagai ERR_NAME.
+export function mapErrorCode(message: string): string | null {
+  if (ERROR_MESSAGES[message]) return ERROR_MESSAGES[message];
+  const keys = Object.keys(ERROR_MESSAGES).sort((a, b) => b.length - a.length);
+  const key = keys.find((k) => message.includes(k));
+  return key ? ERROR_MESSAGES[key] : null;
+}
+
+// Untuk pelanggan: galat jaringan atau tak dikenal tidak ditampilkan mentah (AC-04.12)
 export function getErrorMessage(codeOrMessage: string): string {
-  if (ERROR_MESSAGES[codeOrMessage]) {
-    return ERROR_MESSAGES[codeOrMessage];
-  }
-  // If the message contains an error code e.g. "ERR_STOCK"
-  for (const [key, msg] of Object.entries(ERROR_MESSAGES)) {
-    if (codeOrMessage.includes(key)) {
-      return msg;
-    }
-  }
-  return codeOrMessage;
+  return mapErrorCode(codeOrMessage) ?? ORDER_NOT_SENT_MESSAGE;
+}
+
+// Untuk panel petugas: kode server dipetakan, pesan lain (mis. dari mock) tetap tampil
+export function staffErrorMessage(err: unknown, fallback: string): string {
+  const message = err instanceof Error ? err.message : '';
+  return mapErrorCode(message) ?? (message || fallback);
 }

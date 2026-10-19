@@ -44,17 +44,17 @@ export const BottomBar: React.FC<BottomBarProps> = ({
 
   return (
     <div
-      className="fixed left-0 right-0 z-30 bg-[#FFFFFF] border-t border-[#EBDDCC] shadow-[0_-4px_12px_rgba(51,37,27,0.06)]"
+      className="fixed left-0 right-0 z-30 bg-surface border-t border-line shadow-[0_-4px_12px_rgba(51,37,27,0.06)]"
       style={{ bottom: `${viewportBottom}px` }}
     >
       <div className="max-w-[480px] mx-auto px-4 py-3 flex flex-col gap-2">
         {errorText && (
-          <div className="text-sm text-[#B3261E] font-medium text-center">
+          <div className="text-sm text-danger font-medium text-center">
             {errorText}
           </div>
         )}
         {summaryText && (
-          <div className="text-sm font-semibold text-[#33251B] text-center tabular-nums">
+          <div className="text-sm font-semibold text-ink text-center tabular-nums">
             {summaryText}
           </div>
         )}
@@ -63,7 +63,7 @@ export const BottomBar: React.FC<BottomBarProps> = ({
             <button
               type="button"
               onClick={onSecondaryClick}
-              className="h-12 px-4 rounded-lg border border-[#94806C] text-[#33251B] font-semibold text-sm hover:bg-[#FAF5EB] transition-colors"
+              className="h-12 px-4 rounded-lg border border-edge text-ink font-semibold text-sm hover:bg-cream transition-colors"
             >
               {secondaryButtonText}
             </button>
@@ -74,8 +74,8 @@ export const BottomBar: React.FC<BottomBarProps> = ({
             onClick={onClick}
             className={`w-full h-12 rounded-lg font-semibold text-base transition-colors flex items-center justify-center ${
               disabled
-                ? 'bg-[#E7E2DC] text-[#806D5D] cursor-not-allowed'
-                : 'bg-[#704529] hover:bg-[#5A3720] text-white active:bg-[#5A3720]'
+                ? 'bg-gray text-muted cursor-not-allowed'
+                : 'bg-brand hover:bg-brand-hover text-white active:bg-brand-hover'
             }`}
           >
             {buttonText}

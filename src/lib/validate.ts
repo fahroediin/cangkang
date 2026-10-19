@@ -2,6 +2,11 @@
  * Validation rules and normalization conforming strictly to TelurFarm Spec
  */
 
+// Kelipatan 0,5 kg: num * 2 harus bilangan bulat (toleransi galat floating point)
+export function isHalfKgStep(num: number): boolean {
+  return Math.abs(num * 2 - Math.round(num * 2)) < 1e-9;
+}
+
 export function normalizePhone(raw: string): string | null {
   if (!raw) return null;
   const digits = raw.replace(/\D/g, '');
@@ -27,7 +32,7 @@ export function validateVariantQty(qtyInput: string | number): { valid: boolean;
   if (num > 30) {
     return { valid: false, error: 'Berat maksimal 30 kg per varian' };
   }
-  if (Math.round(num * 10) % 5 !== 0) {
+  if (!isHalfKgStep(num)) {
     return { valid: false, error: 'Berat harus kelipatan 0,5 kg' };
   }
 
@@ -60,7 +65,7 @@ export function validateStockKg(stockInput: string | number): { valid: boolean; 
   if (num > 10000) {
     return { valid: false, error: 'Stok maksimal 10.000 kg' };
   }
-  if (Math.round(num * 10) % 5 !== 0) {
+  if (!isHalfKgStep(num)) {
     return { valid: false, error: 'Stok harus kelipatan 0,5 kg' };
   }
 

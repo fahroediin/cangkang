@@ -3,13 +3,15 @@ import type { DataService } from './DataService.ts';
 import { MockDataService } from './mockService.ts';
 import { SupabaseDataService } from './supabaseService.ts';
 
-let serviceInstance: DataService;
+function createService(): DataService {
+  if (config.dataMode !== 'supabase') return new MockDataService();
 
-if (config.dataMode === 'supabase' && config.supabaseUrl && config.supabaseAnonKey) {
-  serviceInstance = new SupabaseDataService();
-} else {
-  serviceInstance = new MockDataService();
+  // Jangan diam-diam jatuh ke mock: pesanan pelanggan akan tersimpan di browser dan tidak pernah sampai ke depo.
+  if (!config.supabaseUrl || !config.supabaseAnonKey) {
+    throw new Error('VITE_DATA_MODE=supabase tetapi VITE_SUPABASE_URL atau VITE_SUPABASE_ANON_KEY kosong.');
+  }
+  return new SupabaseDataService();
 }
 
-export const dataService = serviceInstance;
+export const dataService = createService();
 export type { DataService };

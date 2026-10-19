@@ -2,11 +2,28 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { PilotSummary, Depot } from '../../types.ts';
 import { dataService } from '../../services/index.ts';
 import { formatRupiah, formatKg } from '../../lib/format.ts';
+import { getWIBDate } from '../../lib/slots.ts';
+
+// Hari ini WIB: di mock mengikuti waktu contoh 19 Okt 2026, di supabase mengikuti jam sungguhan
+function todayWIB(): string {
+  const { year, month, day } = getWIBDate();
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function shiftDate(dateStr: string, days: number): string {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
+}
+
+function presetRange(preset: '7d' | '30d'): { from: string; to: string } {
+  const to = todayWIB();
+  return { from: shiftDate(to, preset === '7d' ? -6 : -29), to };
+}
 
 export const AdminSummary: React.FC = () => {
   const [periodType, setPeriodType] = useState<'7d' | '30d' | 'custom'>('7d');
-  const [dateFrom, setDateFrom] = useState<string>('2026-10-13');
-  const [dateTo, setDateTo] = useState<string>('2026-10-20');
+  const [dateFrom, setDateFrom] = useState<string>(() => presetRange('7d').from);
+  const [dateTo, setDateTo] = useState<string>(() => presetRange('7d').to);
   const [depots, setDepots] = useState<Depot[]>([]);
   const [selectedDepotId, setSelectedDepotId] = useState<string>('semua');
   const [summary, setSummary] = useState<PilotSummary | null>(null);
@@ -18,16 +35,10 @@ export const AdminSummary: React.FC = () => {
 
   // Compute dates based on periodType
   const updateDatesForPreset = (preset: '7d' | '30d') => {
-    // Benchmark mock reference date is 2026-10-19
-    const baseDate = new Date('2026-10-19T23:59:59+07:00');
-    const toStr = baseDate.toISOString().slice(0, 10);
-
-    const fromDate = new Date(baseDate);
-    fromDate.setDate(baseDate.getDate() - (preset === '7d' ? 6 : 29));
-    const fromStr = fromDate.toISOString().slice(0, 10);
-
-    setDateFrom(fromStr);
-    setDateTo(toStr);
+    const { from, to } = presetRange(preset);
+    setDateFrom(from);
+    setDateTo(to);
+    return { from, to };
   };
 
   const loadSummary = useCallback(async (from: string, to: string, depotId?: string) => {
@@ -44,20 +55,15 @@ export const AdminSummary: React.FC = () => {
 
   useEffect(() => {
     dataService.getDepots().then(setDepots);
-    updateDatesForPreset('7d');
-    loadSummary('2026-10-13', '2026-10-20', 'semua');
+    const { from, to } = updateDatesForPreset('7d');
+    loadSummary(from, to, 'semua');
   }, [loadSummary]);
 
   const handlePeriodChange = (type: '7d' | '30d' | 'custom') => {
     setPeriodType(type);
     if (type === '7d' || type === '30d') {
-      updateDatesForPreset(type);
-      const baseDate = new Date('2026-10-19T23:59:59+07:00');
-      const toStr = baseDate.toISOString().slice(0, 10);
-      const fromDate = new Date(baseDate);
-      fromDate.setDate(baseDate.getDate() - (type === '7d' ? 6 : 29));
-      const fromStr = fromDate.toISOString().slice(0, 10);
-      loadSummary(fromStr, toStr, selectedDepotId);
+      const { from, to } = updateDatesForPreset(type);
+      loadSummary(from, to, selectedDepotId);
     }
   };
 
@@ -102,12 +108,12 @@ export const AdminSummary: React.FC = () => {
   return (
     <div className="flex flex-col gap-5 max-w-4xl">
       <div>
-        <h1 className="text-[20px] font-semibold text-[#33251B]">Rekap pilot</h1>
-        <p className="text-xs text-[#806D5D]">Evaluasi penjualan langsung dan titik impas antar gratis</p>
+        <h1 className="text-[20px] font-semibold text-ink">Rekap pilot</h1>
+        <p className="text-xs text-muted">Evaluasi penjualan langsung dan titik impas antar gratis</p>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-surface border border-line rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Preset buttons */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <button
@@ -115,8 +121,8 @@ export const AdminSummary: React.FC = () => {
             onClick={() => handlePeriodChange('7d')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
               periodType === '7d'
-                ? 'bg-[#704529] text-white border-[#704529]'
-                : 'border-[#94806C] text-[#33251B] bg-white hover:bg-[#FAF5EB]'
+                ? 'bg-brand text-white border-brand'
+                : 'border-edge text-ink bg-white hover:bg-cream'
             }`}
           >
             7 hari terakhir
@@ -126,8 +132,8 @@ export const AdminSummary: React.FC = () => {
             onClick={() => handlePeriodChange('30d')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
               periodType === '30d'
-                ? 'bg-[#704529] text-white border-[#704529]'
-                : 'border-[#94806C] text-[#33251B] bg-white hover:bg-[#FAF5EB]'
+                ? 'bg-brand text-white border-brand'
+                : 'border-edge text-ink bg-white hover:bg-cream'
             }`}
           >
             30 hari terakhir
@@ -137,8 +143,8 @@ export const AdminSummary: React.FC = () => {
             onClick={() => setPeriodType('custom')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
               periodType === 'custom'
-                ? 'bg-[#704529] text-white border-[#704529]'
-                : 'border-[#94806C] text-[#33251B] bg-white hover:bg-[#FAF5EB]'
+                ? 'bg-brand text-white border-brand'
+                : 'border-edge text-ink bg-white hover:bg-cream'
             }`}
           >
             Pilih tanggal
@@ -147,14 +153,14 @@ export const AdminSummary: React.FC = () => {
 
         {/* Depo Dropdown */}
         <div className="flex items-center gap-2">
-          <label htmlFor="summary_depot" className="text-xs text-[#806D5D]">
+          <label htmlFor="summary_depot" className="text-xs text-muted">
             Depo:
           </label>
           <select
             id="summary_depot"
             value={selectedDepotId}
             onChange={(e) => handleDepotChange(e.target.value)}
-            className="h-9 px-2.5 rounded-lg border border-[#94806C] text-xs text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529]"
+            className="h-9 px-2.5 rounded-lg border border-edge text-xs text-ink bg-white focus:outline-none focus:border-2 focus:border-brand"
           >
             <option value="semua">Semua depo</option>
             {depots.map((d) => (
@@ -168,9 +174,9 @@ export const AdminSummary: React.FC = () => {
 
       {/* Custom Date Pickers */}
       {periodType === 'custom' && (
-        <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-wrap items-center gap-3">
+        <div className="bg-surface border border-line rounded-lg p-4 flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <label htmlFor="date_from" className="text-xs text-[#806D5D]">
+            <label htmlFor="date_from" className="text-xs text-muted">
               Dari:
             </label>
             <input
@@ -178,12 +184,12 @@ export const AdminSummary: React.FC = () => {
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="h-9 px-2 rounded-lg border border-[#94806C] text-xs text-[#33251B] bg-white"
+              className="h-9 px-2 rounded-lg border border-edge text-xs text-ink bg-white"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <label htmlFor="date_to" className="text-xs text-[#806D5D]">
+            <label htmlFor="date_to" className="text-xs text-muted">
               Sampai:
             </label>
             <input
@@ -191,14 +197,14 @@ export const AdminSummary: React.FC = () => {
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="h-9 px-2 rounded-lg border border-[#94806C] text-xs text-[#33251B] bg-white"
+              className="h-9 px-2 rounded-lg border border-edge text-xs text-ink bg-white"
             />
           </div>
 
           <button
             type="button"
             onClick={handleCustomDateSubmit}
-            className="h-9 px-4 rounded-lg bg-[#704529] hover:bg-[#5A3720] text-white text-xs font-semibold"
+            className="h-9 px-4 rounded-lg bg-brand hover:bg-brand-hover text-white text-xs font-semibold"
           >
             Terapkan
           </button>
@@ -206,14 +212,14 @@ export const AdminSummary: React.FC = () => {
       )}
 
       {dateError && (
-        <div className="p-3 bg-[#FAF5EB] border border-[#B3261E] rounded-lg text-xs text-[#B3261E] font-medium">
+        <div className="p-3 bg-cream border border-danger rounded-lg text-xs text-danger font-medium">
           {dateError}
         </div>
       )}
 
       {/* Zero State Notice AC-12.04 */}
       {summary && summary.pesanan_selesai === 0 && (
-        <div className="p-3 bg-[#FAF5EB] border border-[#EBDDCC] rounded-lg text-sm text-[#806D5D] text-center">
+        <div className="p-3 bg-cream border border-line rounded-lg text-sm text-muted text-center">
           Belum ada pesanan selesai di periode ini
         </div>
       )}
@@ -221,53 +227,53 @@ export const AdminSummary: React.FC = () => {
       {/* Stat Cards - Plain Numbers, no arrows/percentages per 6.1 */}
       {summary && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
-            <span className="text-xs text-[#806D5D]">Pesanan selesai</span>
-            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+          <div className="bg-surface border border-line rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-muted">Pesanan selesai</span>
+            <span className="text-2xl font-bold text-ink tabular-nums mt-1">
               {summary.pesanan_selesai}
             </span>
           </div>
 
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
-            <span className="text-xs text-[#806D5D]">Kg terjual</span>
-            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+          <div className="bg-surface border border-line rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-muted">Kg terjual</span>
+            <span className="text-2xl font-bold text-ink tabular-nums mt-1">
               {formatKg(summary.kg_terjual)}
             </span>
           </div>
 
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
-            <span className="text-xs text-[#806D5D]">Rata-rata kg per pesanan</span>
-            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+          <div className="bg-surface border border-line rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-muted">Rata-rata kg per pesanan</span>
+            <span className="text-2xl font-bold text-ink tabular-nums mt-1">
               {summary.avg_kg_per_pesanan !== null ? formatKg(summary.avg_kg_per_pesanan) : '-'}
             </span>
           </div>
 
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
-            <span className="text-xs text-[#806D5D]">Pendapatan diterima</span>
-            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+          <div className="bg-surface border border-line rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-muted">Pendapatan diterima</span>
+            <span className="text-2xl font-bold text-ink tabular-nums mt-1">
               {formatRupiah(summary.pendapatan_diterima)}
             </span>
           </div>
 
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
-            <span className="text-xs text-[#806D5D]">Pelanggan</span>
-            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+          <div className="bg-surface border border-line rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-muted">Pelanggan</span>
+            <span className="text-2xl font-bold text-ink tabular-nums mt-1">
               {summary.pelanggan}
             </span>
           </div>
 
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col">
-            <span className="text-xs text-[#806D5D]">Pelanggan pesan ulang</span>
-            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+          <div className="bg-surface border border-line rounded-lg p-4 flex flex-col">
+            <span className="text-xs text-muted">Pelanggan pesan ulang</span>
+            <span className="text-2xl font-bold text-ink tabular-nums mt-1">
               {summary.pelanggan_pesan_ulang > 0
                 ? `${summary.pelanggan_pesan_ulang} (${summary.pelanggan_pesan_ulang_pct}%)`
                 : '0'}
             </span>
           </div>
 
-          <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col col-span-2 md:col-span-2">
-            <span className="text-xs text-[#806D5D]">Pembatalan</span>
-            <span className="text-2xl font-bold text-[#33251B] tabular-nums mt-1">
+          <div className="bg-surface border border-line rounded-lg p-4 flex flex-col col-span-2 md:col-span-2">
+            <span className="text-xs text-muted">Pembatalan</span>
+            <span className="text-2xl font-bold text-ink tabular-nums mt-1">
               {summary.pembatalan_pct}%
             </span>
           </div>
@@ -276,13 +282,13 @@ export const AdminSummary: React.FC = () => {
 
       {/* Tabel per Depo */}
       {summary && (
-        <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg overflow-hidden">
-          <div className="px-4 py-3 bg-[#FAF5EB] border-b border-[#EBDDCC]">
-            <h2 className="text-sm font-semibold text-[#33251B]">Rincian Per Depo</h2>
+        <div className="bg-surface border border-line rounded-lg overflow-hidden">
+          <div className="px-4 py-3 bg-cream border-b border-line">
+            <h2 className="text-sm font-semibold text-ink">Rincian Per Depo</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
-              <thead className="border-b border-[#EBDDCC] text-[#806D5D]">
+              <thead className="border-b border-line text-muted">
                 <tr className="h-10">
                   <th className="px-4 text-left">Depo</th>
                   <th className="px-4 text-right">Selesai</th>
@@ -294,7 +300,7 @@ export const AdminSummary: React.FC = () => {
                   <th className="px-4 text-right">Batal</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EBDDCC] text-[#33251B]">
+              <tbody className="divide-y divide-line text-ink">
                 {Object.entries(summary.depots_summary).map(([depotId, dSum]) => (
                   <tr key={depotId} className="h-10">
                     <td className="px-4 font-semibold">{dSum.depot_name}</td>
@@ -320,17 +326,17 @@ export const AdminSummary: React.FC = () => {
       )}
 
       {/* Kalkulator Titik Impas (US-12, AC-12.02, AC-12.03) */}
-      <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-5 flex flex-col gap-4">
+      <div className="bg-surface border border-line rounded-lg p-5 flex flex-col gap-4">
         <div>
-          <h2 className="text-base font-semibold text-[#33251B]">Kalkulator Titik Impas</h2>
-          <p className="text-xs text-[#806D5D]">
+          <h2 className="text-base font-semibold text-ink">Kalkulator Titik Impas</h2>
+          <p className="text-xs text-muted">
             Simulasi kelayakan biaya antar gratis dibandingkan penjualan ke tengkulak
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
-            <label htmlFor="delivery_cost" className="text-xs font-semibold text-[#33251B]">
+            <label htmlFor="delivery_cost" className="text-xs font-semibold text-ink">
               Biaya antar per pesanan (Rp)
             </label>
             <input
@@ -338,12 +344,12 @@ export const AdminSummary: React.FC = () => {
               type="number"
               value={deliveryCostInput}
               onChange={(e) => setDeliveryCostInput(e.target.value)}
-              className="h-10 px-3 rounded-lg border border-[#94806C] text-sm text-[#33251B] bg-white tabular-nums focus:outline-none focus:border-2 focus:border-[#704529]"
+              className="h-11 px-3 rounded-lg border border-edge text-sm text-ink bg-white tabular-nums focus:outline-none focus:border-2 focus:border-brand"
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="tengkulak_price" className="text-xs font-semibold text-[#33251B]">
+            <label htmlFor="tengkulak_price" className="text-xs font-semibold text-ink">
               Harga jual ke tengkulak per kg (Rp)
             </label>
             <input
@@ -351,16 +357,16 @@ export const AdminSummary: React.FC = () => {
               type="number"
               value={tengkulakPriceInput}
               onChange={(e) => setTengkulakPriceInput(e.target.value)}
-              className="h-10 px-3 rounded-lg border border-[#94806C] text-sm text-[#33251B] bg-white tabular-nums focus:outline-none focus:border-2 focus:border-[#704529]"
+              className="h-11 px-3 rounded-lg border border-edge text-sm text-ink bg-white tabular-nums focus:outline-none focus:border-2 focus:border-brand"
             />
           </div>
         </div>
 
-        <div className="p-4 bg-[#FAF5EB] rounded-lg border border-[#EBDDCC] flex flex-col gap-1">
-          <span className="text-xs text-[#806D5D]">Hasil Perhitungan Titik Impas:</span>
+        <div className="p-4 bg-cream rounded-lg border border-line flex flex-col gap-1">
+          <span className="text-xs text-muted">Hasil Perhitungan Titik Impas:</span>
           <span
             className={`text-base font-bold ${
-              breakEvenResult.status === 'loss' ? 'text-[#B3261E]' : 'text-[#33251B]'
+              breakEvenResult.status === 'loss' ? 'text-danger' : 'text-ink'
             }`}
           >
             {breakEvenResult.text}
@@ -369,8 +375,8 @@ export const AdminSummary: React.FC = () => {
             <span
               className={`text-xs font-semibold ${
                 breakEvenResult.subtext === 'Di atas titik impas'
-                  ? 'text-[#2E6B3F]'
-                  : 'text-[#B3261E]'
+                  ? 'text-ok'
+                  : 'text-danger'
               }`}
             >
               {breakEvenResult.subtext} (Rata-rata pesanan: {formatKg(actualAvgKg)})

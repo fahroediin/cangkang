@@ -7,7 +7,8 @@ import {
   validateStockKg,
   validatePricePerKg,
 } from './validate.ts';
-import { formatRupiah, formatKg, formatJarak, formatTanggal } from './format.ts';
+import { formatRupiah, formatKg, formatJarak, formatTanggal, formatTanggalPendek } from './format.ts';
+import { getErrorMessage, ORDER_NOT_SENT_MESSAGE } from './errors.ts';
 import { distanceKm } from './distance.ts';
 import { getAvailableDatesAndSlots, validateSlotSelection } from './slots.ts';
 
@@ -138,4 +139,28 @@ test('slots MRTM_SLOT cutoff rules', () => {
   const check = validateSlotSelection('2026-10-19', 'pagi', t0700);
   assert.equal(check.valid, false);
   assert.equal(check.error, 'Jadwal yang dipilih sudah tutup. Pilih jadwal lain.');
+});
+
+test('kelipatan 0,5 kg ditolak untuk nilai di antara langkah 0,5', () => {
+  // 1,02 kg lolos pembulatan *10 lama, padahal server menolak (ERR_QTY)
+  assert.equal(validateVariantQty('1,02').valid, false);
+  assert.equal(validateVariantQty('1,02').error, 'Berat harus kelipatan 0,5 kg');
+  assert.equal(validateVariantQty('1,5').valid, true);
+  assert.equal(validateStockKg('12,02').valid, false);
+  assert.equal(validateStockKg('12,02').error, 'Stok harus kelipatan 0,5 kg');
+  assert.equal(validateStockKg('12,5').valid, true);
+});
+
+test('getErrorMessage memetakan kode server dan menyembunyikan pesan teknis', () => {
+  assert.equal(getErrorMessage('ERR_NAME_LONG'), 'Nama maksimal 80 karakter');
+  assert.equal(getErrorMessage('ERR_STOCK'), 'Stok berubah saat Anda memesan. Pilih depo lagi atau kurangi berat.');
+  // AC-04.12: galat jaringan dari fetch tidak boleh tampil mentah
+  assert.equal(getErrorMessage('TypeError: Failed to fetch'), ORDER_NOT_SENT_MESSAGE);
+  assert.equal(getErrorMessage(''), ORDER_NOT_SENT_MESSAGE);
+  assert.equal(ORDER_NOT_SENT_MESSAGE, 'Pesanan belum terkirim. Periksa koneksi lalu tekan Kirim pesanan lagi.');
+});
+
+test('formatTanggalPendek untuk pilihan tanggal antar', () => {
+  assert.equal(formatTanggalPendek('2026-10-20'), '20 Okt');
+  assert.equal(formatTanggalPendek('2026-01-01'), '1 Jan');
 });

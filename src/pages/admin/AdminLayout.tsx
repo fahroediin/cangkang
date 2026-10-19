@@ -36,7 +36,7 @@ export const AdminLayout: React.FC = () => {
 
   if (loading || !staff) {
     return (
-      <div className="min-h-screen bg-[#FAF5EB] flex items-center justify-center text-sm text-[#806D5D]">
+      <div className="min-h-screen bg-cream flex items-center justify-center text-sm text-muted">
         Memuat data petugas...
       </div>
     );
@@ -56,20 +56,20 @@ export const AdminLayout: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAF5EB] flex flex-col md:flex-row">
+    <div className="min-h-screen bg-cream flex flex-col md:flex-row">
       {/* Desktop Sidebar (220px per Section 6.3) */}
-      <aside className="hidden md:flex flex-col w-[220px] bg-[#FFFFFF] border-r border-[#EBDDCC] p-4 min-h-screen justify-between shrink-0">
+      <aside className="hidden md:flex flex-col w-[220px] bg-surface border-r border-line p-4 min-h-screen justify-between shrink-0">
         <div className="flex flex-col gap-6">
           <div>
-            <span className="text-[20px] font-bold text-[#704529] tracking-tight block">
+            <span className="text-[20px] font-bold text-brand tracking-tight block">
               TelurFarm
             </span>
-            <span className="text-xs text-[#806D5D]">Panel Petugas</span>
+            <span className="text-xs text-muted">Panel Petugas</span>
           </div>
 
-          <div className="p-3 bg-[#FAF5EB] border border-[#EBDDCC] rounded-lg flex flex-col">
-            <span className="text-sm font-semibold text-[#33251B]">{staff.full_name}</span>
-            <span className="text-xs text-[#704529] capitalize font-medium">
+          <div className="p-3 bg-cream border border-line rounded-lg flex flex-col">
+            <span className="text-sm font-semibold text-ink">{staff.full_name}</span>
+            <span className="text-xs text-brand capitalize font-medium">
               {staff.role === 'owner' ? 'Owner' : `Admin Depo ${staff.depot_id || ''}`}
             </span>
           </div>
@@ -88,8 +88,8 @@ export const AdminLayout: React.FC = () => {
                   to={item.path}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                     isActive
-                      ? 'bg-[#704529] text-white'
-                      : 'text-[#33251B] hover:bg-[#FAF5EB]'
+                      ? 'bg-brand text-white'
+                      : 'text-ink hover:bg-cream'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -103,7 +103,7 @@ export const AdminLayout: React.FC = () => {
         <button
           type="button"
           onClick={handleLogout}
-          className="flex items-center gap-2 px-3 py-2 text-sm text-[#806D5D] hover:text-[#B3261E] rounded-lg transition-colors"
+          className="flex items-center gap-2 px-3 py-2 text-sm text-muted hover:text-danger rounded-lg transition-colors"
         >
           <LogOut className="w-4 h-4" />
           Keluar
@@ -113,17 +113,17 @@ export const AdminLayout: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-screen pb-16 md:pb-8">
         {/* Mobile Header (56px) */}
-        <header className="md:hidden sticky top-0 z-30 bg-[#FFFFFF] border-b border-[#EBDDCC] px-4 h-14 flex items-center justify-between">
+        <header className="md:hidden sticky top-0 z-30 bg-surface border-b border-line px-4 h-14 flex items-center justify-between">
           <div>
-            <span className="text-base font-bold text-[#704529]">TelurFarm</span>
-            <span className="text-xs text-[#806D5D] ml-2">
+            <span className="text-base font-bold text-brand">TelurFarm</span>
+            <span className="text-xs text-muted ml-2">
               {staff.role === 'owner' ? 'Owner' : `Depo ${staff.depot_id || ''}`}
             </span>
           </div>
           <button
             type="button"
             onClick={handleLogout}
-            className="text-xs font-semibold text-[#806D5D] hover:text-[#B3261E] px-2 py-1 border border-[#94806C] rounded"
+            className="text-xs font-semibold text-muted hover:text-danger px-2 py-1 border border-edge rounded"
           >
             Keluar
           </button>
@@ -131,7 +131,7 @@ export const AdminLayout: React.FC = () => {
 
         {/* Owner-only notification banner if redirected */}
         {ownerOnlyNotice && (
-          <div className="p-3 bg-[#FAF5EB] border-b border-[#B3261E] text-sm text-[#B3261E] font-medium text-center">
+          <div className="p-3 bg-cream border-b border-danger text-sm text-danger font-medium text-center">
             {ownerOnlyNotice}
           </div>
         )}
@@ -141,7 +141,7 @@ export const AdminLayout: React.FC = () => {
         </main>
 
         {/* Mobile Bottom Navigation (tabs per spec 6.3) */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#FFFFFF] border-t border-[#EBDDCC] flex items-center justify-around h-14 px-2">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface border-t border-line flex items-center justify-around h-14 px-2">
           {navItems.map((item) => {
             const isActive =
               item.path === '/admin'
@@ -154,7 +154,7 @@ export const AdminLayout: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 className={`flex flex-col items-center justify-center flex-1 h-full text-xs font-semibold ${
-                  isActive ? 'text-[#704529]' : 'text-[#806D5D]'
+                  isActive ? 'text-brand' : 'text-muted'
                 }`}
               >
                 <Icon className="w-5 h-5 mb-0.5" />

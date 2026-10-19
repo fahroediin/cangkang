@@ -59,9 +59,9 @@ export class SupabaseDataService implements DataService {
 
   async setStock(depotId: string, variantId: string, stockKg: number): Promise<void> {
     const { error } = await this.client.rpc('set_stock', {
-      depot_id: depotId,
-      variant_id: variantId,
-      stock_kg: stockKg,
+      p_depot_id: depotId,
+      p_variant_id: variantId,
+      p_stock_kg: stockKg,
     });
     if (error) throw new Error(error.message);
   }
@@ -72,9 +72,9 @@ export class SupabaseDataService implements DataService {
     items: { variant_id: string; qty_kg: number }[]
   ): Promise<DepotCheck[]> {
     const { data, error } = await this.client.rpc('check_depots', {
-      lat,
-      lng,
-      items,
+      p_lat: lat,
+      p_lng: lng,
+      p_items: items,
     });
     if (error) throw new Error(error.message);
     return data || [];
@@ -103,22 +103,13 @@ export class SupabaseDataService implements DataService {
 
   async trackOrder(code: string, last4: string): Promise<Order | null> {
     const { data, error } = await this.client.rpc('track_order', {
-      code: code.trim().toUpperCase(),
-      last4: last4.trim(),
+      p_code: code.trim().toUpperCase(),
+      p_last4: last4.trim(),
     });
     if (error || !data) return null;
     return data as Order;
   }
 
-  async getOrder(code: string): Promise<Order | null> {
-    // For direct url access, track_order checks last 4 digits
-    const { data } = await this.client
-      .from('orders')
-      .select('*, items:order_items(*), events:order_events(*)')
-      .eq('code', code.trim().toUpperCase())
-      .single();
-    return data || null;
-  }
 
   async loginStaff(email: string, password: string): Promise<Staff> {
     const { data: authData, error: authError } = await this.client.auth.signInWithPassword({
@@ -208,12 +199,12 @@ export class SupabaseDataService implements DataService {
     is_paid?: boolean;
   }): Promise<Order> {
     const { data, error } = await this.client.rpc('set_order_status', {
-      order_id: p.order_id,
-      expected_status: p.expected_status,
-      to_status: p.to_status,
-      courier_name: p.courier_name || null,
-      cancel_reason: p.cancel_reason || null,
-      is_paid: p.is_paid ?? null,
+      p_order_id: p.order_id,
+      p_expected_status: p.expected_status,
+      p_to_status: p.to_status,
+      p_courier_name: p.courier_name || null,
+      p_cancel_reason: p.cancel_reason || null,
+      p_is_paid: p.is_paid ?? null,
     });
 
     if (error) {
@@ -225,9 +216,9 @@ export class SupabaseDataService implements DataService {
 
   async getPilotSummary(dateFrom: string, dateTo: string, depotId?: string): Promise<PilotSummary> {
     const { data, error } = await this.client.rpc('pilot_summary', {
-      date_from: dateFrom,
-      date_to: dateTo,
-      depot_id: depotId || null,
+      p_date_from: dateFrom,
+      p_date_to: dateTo,
+      p_depot_id: depotId || null,
     });
     if (error) throw new Error(error.message);
     return data as PilotSummary;

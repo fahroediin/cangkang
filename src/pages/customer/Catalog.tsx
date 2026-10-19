@@ -110,12 +110,12 @@ export const Catalog: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF5EB] flex flex-col pb-24">
+    <div className="min-h-screen bg-cream flex flex-col pb-24">
       <Header />
 
       <main className="max-w-[480px] w-full mx-auto px-4 py-4 flex flex-col gap-4">
         {/* Info line per spec 6.1 */}
-        <div className="py-2 px-3 bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg text-sm text-[#806D5D] flex items-center">
+        <div className="py-2 px-3 bg-surface border border-line rounded-lg text-sm text-muted flex items-center">
           Gratis ongkir dalam 5 km dari depo
         </div>
 
@@ -125,7 +125,7 @@ export const Catalog: React.FC = () => {
             {[1, 2, 3].map((idx) => (
               <div
                 key={idx}
-                className="h-36 rounded-lg bg-[#E7E2DC] border border-[#EBDDCC]"
+                className="h-36 rounded-lg bg-gray border border-line"
               />
             ))}
           </div>
@@ -138,14 +138,14 @@ export const Catalog: React.FC = () => {
               return (
                 <div
                   key={v.id}
-                  className="bg-[#FFFFFF] rounded-lg border border-[#EBDDCC] p-4 flex flex-col gap-3"
+                  className="bg-surface rounded-lg border border-line p-4 flex flex-col gap-3"
                 >
                   <div className="flex flex-col">
-                    <h2 className="text-[16px] font-semibold text-[#33251B]">{v.name}</h2>
-                    <p className="text-[14px] text-[#806D5D]">{v.description}</p>
+                    <h2 className="text-[16px] font-semibold text-ink">{v.name}</h2>
+                    <p className="text-[14px] text-muted">{v.description}</p>
                   </div>
 
-                  <div className="text-[20px] font-semibold text-[#33251B] tabular-nums">
+                  <div className="text-[20px] font-semibold text-ink tabular-nums">
                     {formatRupiah(v.price_per_kg)}/kg
                   </div>
 
@@ -158,14 +158,14 @@ export const Catalog: React.FC = () => {
                       type="button"
                       aria-label={`Tambah ${v.name} ke keranjang`}
                       onClick={() => handleAddToCart(v)}
-                      className="flex-1 h-11 px-4 rounded-lg bg-[#704529] hover:bg-[#5A3720] text-white font-semibold text-sm transition-colors"
+                      className="flex-1 h-11 px-4 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-sm transition-colors"
                     >
                       Tambah ke keranjang
                     </button>
                   </div>
 
                   {error && (
-                    <div className="text-[14px] text-[#B3261E] font-medium">
+                    <div className="text-[14px] text-danger font-medium">
                       {error}
                     </div>
                   )}
@@ -178,7 +178,7 @@ export const Catalog: React.FC = () => {
 
       {/* Toast 3 seconds per spec 6.4 */}
       {toastMessage && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-[#33251B] text-white text-sm px-4 py-2.5 rounded-lg shadow-[0_4px_12px_rgba(51,37,27,0.12)] transition-opacity duration-150">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-ink text-white text-sm px-4 py-2.5 rounded-lg shadow-[0_4px_12px_rgb(51_37_27/0.12)] transition-opacity duration-150">
           {toastMessage}
         </div>
       )}

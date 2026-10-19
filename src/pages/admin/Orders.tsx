@@ -103,25 +103,25 @@ export const AdminOrders: React.FC = () => {
     <div className="flex flex-col gap-5">
       {/* Realtime Toast notification AC-08.02 */}
       {newOrderToast && (
-        <div className="fixed top-16 right-4 z-50 bg-[#33251B] text-white text-sm px-4 py-3 rounded-lg shadow-lg border border-[#EBDDCC]">
+        <div className="fixed top-16 right-4 z-50 bg-ink text-white text-sm px-4 py-3 rounded-lg shadow-[0_4px_12px_rgb(51_37_27/0.12)] border border-line">
           {newOrderToast}
         </div>
       )}
 
       {/* Top Header & Owner Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h1 className="text-[20px] font-semibold text-[#33251B]">{getPageTitle()}</h1>
+        <h1 className="text-[20px] font-semibold text-ink">{getPageTitle()}</h1>
 
         {isOwner && (
           <div className="flex items-center gap-2">
-            <label htmlFor="depot_filter" className="text-sm text-[#806D5D]">
+            <label htmlFor="depot_filter" className="text-sm text-muted">
               Depo:
             </label>
             <select
               id="depot_filter"
               value={selectedDepotId}
               onChange={(e) => setSelectedDepotId(e.target.value)}
-              className="h-10 px-3 rounded-lg border border-[#94806C] text-sm text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529]"
+              className="h-11 px-3 rounded-lg border border-edge text-sm text-ink bg-white focus:outline-none focus:border-2 focus:border-brand"
             >
               <option value="semua">Semua depo</option>
               {depots.map((d) => (
@@ -135,7 +135,7 @@ export const AdminOrders: React.FC = () => {
       </div>
 
       {/* Status Filter Tabs (US-08) */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-b border-[#EBDDCC]">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-b border-line">
         {STATUS_TABS.map((tab) => {
           const count = getTabCount(tab.key);
           const isActive = activeTab === tab.key;
@@ -146,14 +146,14 @@ export const AdminOrders: React.FC = () => {
               onClick={() => setActiveTab(tab.key)}
               className={`px-3 py-2 rounded-t-lg text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-colors border-b-2 ${
                 isActive
-                  ? 'border-[#704529] text-[#704529] bg-[#FAF5EB]'
-                  : 'border-transparent text-[#806D5D] hover:text-[#33251B]'
+                  ? 'border-brand text-brand bg-cream'
+                  : 'border-transparent text-muted hover:text-ink'
               }`}
             >
               <span>{tab.label}</span>
               <span
                 className={`text-xs px-1.5 py-0.2 rounded-full tabular-nums ${
-                  isActive ? 'bg-[#704529] text-white' : 'bg-[#E7E2DC] text-[#33251B]'
+                  isActive ? 'bg-brand text-white' : 'bg-gray text-ink'
                 }`}
               >
                 {count}
@@ -165,7 +165,7 @@ export const AdminOrders: React.FC = () => {
 
       {/* Orders List / Table */}
       {sortedOrders.length === 0 ? (
-        <div className="p-8 bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg text-center text-sm text-[#806D5D]">
+        <div className="p-8 bg-surface border border-line rounded-lg text-center text-sm text-muted">
           Tidak ada pesanan dengan status ini.
         </div>
       ) : (
@@ -180,26 +180,26 @@ export const AdminOrders: React.FC = () => {
                 <div
                   key={order.id}
                   onClick={() => navigate(`/admin/pesanan/${order.id}`)}
-                  className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg p-4 flex flex-col gap-2 cursor-pointer hover:bg-[#FAF5EB] transition-colors"
+                  className="bg-surface border border-line rounded-lg p-4 flex flex-col gap-2 cursor-pointer hover:bg-cream transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="text-sm font-bold text-[#33251B] tabular-nums">
+                      <span className="text-sm font-bold text-ink tabular-nums">
                         {order.code}
                       </span>
-                      <span className="text-xs text-[#806D5D] block">{order.customer_name}</span>
+                      <span className="text-xs text-muted block">{order.customer_name}</span>
                     </div>
                     <StatusBadge status={order.status} />
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-[#806D5D] pt-1 border-t border-[#EBDDCC]">
+                  <div className="flex items-center justify-between text-xs text-muted pt-1 border-t border-line">
                     <span>
                       {formatTanggal(order.delivery_date, { shortMonth: true })} ({slotLabel})
                     </span>
                     <span>{formatJarak(order.distance_km)}</span>
                   </div>
 
-                  <div className="flex items-center justify-between text-sm font-semibold text-[#33251B] tabular-nums pt-1">
+                  <div className="flex items-center justify-between text-sm font-semibold text-ink tabular-nums pt-1">
                     <span>{formatKg(totalWeight)}</span>
                     <span className="text-base">{formatRupiah(order.total)}</span>
                   </div>
@@ -209,10 +209,10 @@ export const AdminOrders: React.FC = () => {
           </div>
 
           {/* Desktop Table (>=768px per spec 6.3) */}
-          <div className="hidden md:block bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg overflow-hidden">
+          <div className="hidden md:block bg-surface border border-line rounded-lg overflow-hidden">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-[#FAF5EB] border-b border-[#EBDDCC] sticky top-0">
-                <tr className="h-12 text-xs font-semibold text-[#806D5D]">
+              <thead className="bg-cream border-b border-line sticky top-0">
+                <tr className="h-12 text-xs font-semibold text-muted">
                   <th className="px-4 text-left">Kode</th>
                   <th className="px-4 text-left">Penerima</th>
                   {isOwner && <th className="px-4 text-left">Depo</th>}
@@ -223,7 +223,7 @@ export const AdminOrders: React.FC = () => {
                   <th className="px-4 text-left">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EBDDCC] text-sm text-[#33251B]">
+              <tbody className="divide-y divide-line text-sm text-ink">
                 {sortedOrders.map((order) => {
                   const totalWeight = (order.items || []).reduce(
                     (sum, item) => sum + item.qty_kg,
@@ -235,12 +235,12 @@ export const AdminOrders: React.FC = () => {
                     <tr
                       key={order.id}
                       onClick={() => navigate(`/admin/pesanan/${order.id}`)}
-                      className="h-12 hover:bg-[#F3E8D8] cursor-pointer transition-colors"
+                      className="h-12 hover:bg-soft cursor-pointer transition-colors"
                     >
                       <td className="px-4 font-semibold tabular-nums">{order.code}</td>
                       <td className="px-4">{order.customer_name}</td>
                       {isOwner && (
-                        <td className="px-4 text-xs text-[#806D5D]">{order.depot_name}</td>
+                        <td className="px-4 text-xs text-muted">{order.depot_name}</td>
                       )}
                       <td className="px-4 text-xs">
                         {formatTanggal(order.delivery_date, { shortMonth: true })}, {slotLabel}
@@ -249,7 +249,7 @@ export const AdminOrders: React.FC = () => {
                       <td className="px-4 text-right font-semibold tabular-nums">
                         {formatRupiah(order.total)}
                       </td>
-                      <td className="px-4 text-right tabular-nums text-xs text-[#806D5D]">
+                      <td className="px-4 text-right tabular-nums text-xs text-muted">
                         {formatJarak(order.distance_km)}
                       </td>
                       <td className="px-4">

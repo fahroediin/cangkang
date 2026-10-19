@@ -346,15 +346,15 @@ Keranjang kosong di P2 menampilkan "Keranjang masih kosong" dan tombol "Pilih te
 
 ### 8.3 US-02 Menandai Lokasi Antar
 
-P3 bagian atas: peta Leaflet setinggi 50% layar, pin tujuan bisa digeser, tombol "Pakai lokasi saya". Peta awal berpusat di tengah tiga depo, zoom 11.
+P3 bagian atas: peta Leaflet setinggi 50% layar, titik tujuan ditentukan dengan mengetuk peta (lebih mudah di ponsel daripada menyeret pin), tombol "Pakai lokasi saya". Peta awal berpusat di tengah tiga depo, zoom 11.
 
 | AC-ID | Kategori | Skenario | GIVEN | WHEN | THEN |
 |---|---|---|---|---|---|
 | AC-02.01 | Happy | Memakai GPS ponsel | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND browser belum pernah ditanya izin lokasi | Saya mengklik tombol "Pakai lokasi saya"<br>AND saya mengklik "Izinkan" di dialog izin lokasi browser | Pin tujuan pindah ke posisi saya<br>AND peta memusat ke pin dengan zoom 16<br>AND daftar depo diperbarui dengan jarak dari pin |
-| AC-02.02 | Negative | Izin lokasi ditolak | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar" | Saya mengklik tombol "Pakai lokasi saya"<br>AND saya mengklik "Blokir" di dialog izin lokasi browser | Muncul teks "Izin lokasi ditolak. Geser pin di peta ke rumah Anda."<br>AND keranjang tidak berubah |
-| AC-02.03 | Happy | Menggeser pin manual | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar" | Saya drag pin tujuan ke titik rumah saya di peta | Daftar depo diperbarui dengan jarak dari titik baru |
-| AC-02.04 | Edge | Lanjut tanpa pernah menentukan titik | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND saya belum memakai GPS dan belum menggeser pin | Saya mengklik tombol "Isi data pengiriman" | Muncul teks "Tentukan titik antar dulu: pakai lokasi Anda atau geser pin."<br>AND saya tetap di halaman "Lokasi antar" |
-| AC-02.05 | Edge | GPS tidak memberi posisi dalam 10 detik | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND izin lokasi sudah diberikan<br>AND sinyal GPS lemah | Saya mengklik tombol "Pakai lokasi saya" | Setelah 10 detik muncul teks "Lokasi belum ketemu. Geser pin di peta ke rumah Anda." |
+| AC-02.02 | Negative | Izin lokasi ditolak | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar" | Saya mengklik tombol "Pakai lokasi saya"<br>AND saya mengklik "Blokir" di dialog izin lokasi browser | Muncul teks "Izin lokasi ditolak. Ketuk peta di titik rumah Anda."<br>AND keranjang tidak berubah |
+| AC-02.03 | Happy | Menentukan titik dengan mengetuk peta | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar" | Saya mengetuk titik rumah saya di peta | Daftar depo diperbarui dengan jarak dari titik baru |
+| AC-02.04 | Edge | Lanjut tanpa pernah menentukan titik | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND saya belum memakai GPS dan belum mengetuk peta | Saya mengklik tombol "Isi data pengiriman" | Muncul teks "Tentukan titik antar dulu: pakai lokasi Anda atau ketuk peta."<br>AND saya tetap di halaman "Lokasi antar" |
+| AC-02.05 | Edge | GPS tidak memberi posisi dalam 10 detik | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND izin lokasi sudah diberikan<br>AND sinyal GPS lemah | Saya mengklik tombol "Pakai lokasi saya" | Setelah 10 detik muncul teks "Lokasi belum ketemu. Ketuk peta di titik rumah Anda." |
 
 Akurasi GPS di atas 100 m ditampilkan sebagai teks "Lokasi kurang akurat (sekitar 250 m). Periksa posisi pin." tanpa memblokir.
 
@@ -377,10 +377,10 @@ Kartu tidak menampilkan angka stok, hanya cukup atau tidak.
 
 | AC-ID | Kategori | Skenario | GIVEN | WHEN | THEN |
 |---|---|---|---|---|---|
-| AC-03.02 | Happy | Depo layak terdekat terpilih otomatis | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND Depo Cilegon layak di 2,3 km dan Depo Serang layak di 4,1 km | Saya drag pin tujuan ke titik rumah saya | Kartu Depo Cilegon berada paling atas dengan radio terpilih<br>AND kartu Depo Serang di bawahnya tanpa radio terpilih |
+| AC-03.02 | Happy | Depo layak terdekat terpilih otomatis | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND Depo Cilegon layak di 2,3 km dan Depo Serang layak di 4,1 km | Saya mengetuk titik rumah saya di peta | Kartu Depo Cilegon berada paling atas dengan radio terpilih<br>AND kartu Depo Serang di bawahnya tanpa radio terpilih |
 | AC-03.03 | Happy | Memilih depo layak lain | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND Depo Cilegon terpilih otomatis<br>AND Depo Serang juga layak | Saya mengklik kartu Depo Serang<br>AND saya mengklik tombol "Isi data pengiriman" | Sistem membuka halaman "Data pengiriman" dengan ringkasan "Diantar dari Depo Serang" |
-| AC-03.04 | Negative | Tidak ada depo layak | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND titik saya 12 km dari depo terdekat | Saya drag pin tujuan ke titik rumah saya | Muncul teks "Belum ada depo yang bisa mengantar ke lokasi ini dengan isi keranjang sekarang."<br>AND tombol "Isi data pengiriman" nonaktif<br>AND muncul tombol "Tanya lewat WhatsApp" |
-| AC-03.05 | Edge | Tanpa sinyal saat memuat depo | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND koneksi internet terputus | Saya drag pin tujuan | Muncul teks "Gagal memuat depo. Periksa koneksi lalu coba lagi."<br>AND muncul tombol "Coba lagi"<br>AND keranjang tidak berubah |
+| AC-03.04 | Negative | Tidak ada depo layak | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND titik saya 12 km dari depo terdekat | Saya mengetuk titik rumah saya di peta | Muncul teks "Belum ada depo yang bisa mengantar ke lokasi ini dengan isi keranjang sekarang."<br>AND tombol "Isi data pengiriman" nonaktif<br>AND muncul tombol "Tanya lewat WhatsApp" |
+| AC-03.05 | Edge | Tanpa sinyal saat memuat depo | Saya seorang Pelanggan<br>AND saya berada di halaman "Lokasi antar"<br>AND koneksi internet terputus | Saya mengetuk titik rumah saya di peta | Muncul teks "Gagal memuat depo. Periksa koneksi lalu coba lagi."<br>AND muncul tombol "Coba lagi"<br>AND keranjang tidak berubah |
 
 "Tanya lewat WhatsApp" membuka nomor WhatsApp owner (konfigurasi `VITE_OWNER_WA`) dengan teks "Halo TelurFarm, saya mau pesan telur tapi lokasi saya belum terjangkau depo. Lokasi saya: https://maps.google.com/?q={lat},{lng}".
 
@@ -829,15 +829,15 @@ Setiap `raise exception` membatalkan seluruh transaksi, termasuk pengurangan sto
 
 ### 9.6 RPC lain (kontrak)
 
-Semua `security definer`, `set search_path = public, extensions` (di Supabase, pgcrypto terpasang di schema `extensions`).
+Semua `security definer`, `set search_path = public, extensions` (di Supabase, pgcrypto terpasang di schema `extensions`). Nama parameter memakai awalan `p_` supaya tidak bentrok dengan nama kolom di PL/pgSQL (`depot_id`, `stock_kg`, dan seterusnya akan dianggap ambigu). Klien memanggil dengan nama yang sama persis.
 
 | RPC | Pemanggil | Masukan | Keluaran | Aturan |
 |---|---|---|---|---|
-| `check_depots(lat, lng, items jsonb)` | anon | titik + `[{variant_id, qty_kg}]` | baris per depo: `id, name, address, distance_km, radius_km, eligible, reason` | `reason` salah satu `closed`, `out_of_range`, `stock:<variant_name>`, atau null. Prioritas closed > out_of_range > stock. Tidak mengembalikan angka stok. Urut: eligible dulu, lalu jarak |
-| `track_order(code, last4)` | anon | kode (trim, upper), 4 digit | jsonb pesanan + items + events + depot name/wa, atau null | Cocok jika `right(customer_phone, 4) = last4`. Tidak mengembalikan nomor lengkap |
-| `set_order_status(order_id, expected_status, to_status, courier_name, cancel_reason, is_paid)` | authenticated staf | sesuai nama | jsonb pesanan terbaru | Staf harus owner atau admin depo pesanan itu. `update ... where id = order_id and status = expected_status`; 0 baris -> `ERR_STALE`. Transisi valid: baru->diproses, diproses->dikirim (courier 1-50 karakter), dikirim->selesai, baru->dibatalkan, diproses->dibatalkan (alasan wajib). Pembatalan menambah stok tiap item dalam transaksi yang sama. Tulis `order_events` dengan `actor = auth.uid()` |
-| `set_stock(depot_id, variant_id, stock_kg)` | authenticated staf | sesuai nama | baris stok | Owner semua depo, admin depo hanya depo sendiri. Validasi BR-16. Isi `updated_by` |
-| `pilot_summary(date_from, date_to, depot_id null)` | owner | periode | jsonb angka bagian 8.13 total dan per depo, plus `avg_price_per_kg` | Tolak jika bukan owner. Filter `delivery_date` |
+| `check_depots(p_lat, p_lng, p_items jsonb)` | anon | titik + `[{variant_id, qty_kg}]` | baris per depo: `id, name, address, distance_km, radius_km, eligible, reason` | `reason` salah satu `closed`, `out_of_range`, `stock:<variant_name>`, atau null. Prioritas closed > out_of_range > stock. Tidak mengembalikan angka stok. Urut: eligible dulu, lalu jarak |
+| `track_order(p_code, p_last4)` | anon | kode (trim, upper), 4 digit | jsonb pesanan + items + events + depot name/wa, atau null | Cocok jika `right(customer_phone, 4) = p_last4`. Tidak mengembalikan nomor lengkap |
+| `set_order_status(p_order_id, p_expected_status, p_to_status, p_courier_name, p_cancel_reason, p_is_paid)` | authenticated staf | sesuai nama | jsonb pesanan terbaru | Staf harus owner atau admin depo pesanan itu. `update ... where id = p_order_id and status = p_expected_status`; 0 baris -> `ERR_STALE`. Transisi valid: baru->diproses, diproses->dikirim (courier 1-50 karakter), dikirim->selesai, baru->dibatalkan, diproses->dibatalkan (alasan wajib). Pembatalan menambah stok tiap item dalam transaksi yang sama. Tulis `order_events` dengan `actor = auth.uid()` |
+| `set_stock(p_depot_id, p_variant_id, p_stock_kg)` | authenticated staf | sesuai nama | baris stok | Owner semua depo, admin depo hanya depo sendiri. Validasi BR-16. Isi `updated_by` |
+| `pilot_summary(p_date_from, p_date_to, p_depot_id null)` | owner | periode | jsonb angka bagian 8.13 total dan per depo, plus `avg_price_per_kg` | Tolak jika bukan owner. Filter `delivery_date` |
 
 ### 9.7 RLS
 

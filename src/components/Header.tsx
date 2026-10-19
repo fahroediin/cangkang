@@ -33,16 +33,16 @@ export const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FFFFFF] border-b border-[#EBDDCC]">
+    <header className="sticky top-0 z-40 bg-surface border-b border-line">
       {!isOnline && (
-        <div className="bg-[#33251B] text-white text-xs py-1 px-4 text-center">
+        <div className="bg-ink text-white text-xs py-1 px-4 text-center">
           Tidak ada koneksi. Pesanan belum bisa dikirim.
         </div>
       )}
       <div className="max-w-[480px] mx-auto h-14 px-4 flex items-center justify-between">
         <Link
           to="/"
-          className="text-[20px] font-bold text-[#704529] tracking-tight hover:opacity-90"
+          className="text-[20px] font-bold text-brand tracking-tight hover:opacity-90"
         >
           TelurFarm
         </Link>
@@ -50,7 +50,7 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-4">
           <Link
             to="/lacak"
-            className="text-sm font-medium text-[#33251B] hover:text-[#704529] underline-offset-4"
+            className="text-sm font-medium text-ink hover:text-brand underline-offset-4"
           >
             Lacak pesanan
           </Link>
@@ -58,12 +58,12 @@ export const Header: React.FC = () => {
           <Link
             to="/keranjang"
             aria-label={`Keranjang, ${formatKg(cartKg)}`}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#EBDDCC] hover:bg-[#FAF5EB] text-[#33251B]"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-line hover:bg-cream text-ink"
           >
             <div className="relative">
-              <ShoppingBag className="w-5 h-5 text-[#704529]" />
+              <ShoppingBag className="w-5 h-5 text-brand" />
               {cartKg > 0 && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#F3BF38] rounded-full border border-white" />
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-yolk rounded-full border border-white" />
               )}
             </div>
             <span className="text-sm font-medium tabular-nums">{formatKg(cartKg)}</span>

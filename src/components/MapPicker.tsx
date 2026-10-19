@@ -57,7 +57,7 @@ export const MapPicker: React.FC<MapPickerProps> = ({
 
   const handleUseMyLocation = () => {
     if (!navigator.geolocation) {
-      setGpsNotice('Izin lokasi ditolak. Geser pin di peta ke rumah Anda.');
+      setGpsNotice('Izin lokasi ditolak. Ketuk peta di titik rumah Anda.');
       return;
     }
 
@@ -68,7 +68,7 @@ export const MapPicker: React.FC<MapPickerProps> = ({
     const timer = setTimeout(() => {
       hasTimedOut = true;
       setGpsLoading(false);
-      setGpsNotice('Lokasi belum ketemu. Geser pin di peta ke rumah Anda.');
+      setGpsNotice('Lokasi belum ketemu. Ketuk peta di titik rumah Anda.');
     }, 10000);
 
     navigator.geolocation.getCurrentPosition(
@@ -96,7 +96,7 @@ export const MapPicker: React.FC<MapPickerProps> = ({
         if (hasTimedOut) return;
         clearTimeout(timer);
         setGpsLoading(false);
-        setGpsNotice('Izin lokasi ditolak. Geser pin di peta ke rumah Anda.');
+        setGpsNotice('Izin lokasi ditolak. Ketuk peta di titik rumah Anda.');
       },
       { enableHighAccuracy: true, timeout: 9500 }
     );
@@ -105,25 +105,25 @@ export const MapPicker: React.FC<MapPickerProps> = ({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-[#33251B]">Titik antar di peta</span>
+        <span className="text-sm font-semibold text-ink">Titik antar di peta</span>
         <button
           type="button"
           onClick={handleUseMyLocation}
           disabled={gpsLoading}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#94806C] text-xs font-semibold text-[#33251B] hover:bg-[#FAF5EB] transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-edge text-xs font-semibold text-ink hover:bg-cream transition-colors"
         >
-          <MapPin className="w-4 h-4 text-[#704529]" />
+          <MapPin className="w-4 h-4 text-brand" />
           {gpsLoading ? 'Mencari lokasi...' : 'Pakai lokasi saya'}
         </button>
       </div>
 
       {gpsNotice && (
-        <div className="text-xs text-[#806D5D] bg-[#F3E8D8] p-2 rounded-lg border border-[#EBDDCC]">
+        <div className="text-xs text-muted bg-soft p-2 rounded-lg border border-line">
           {gpsNotice}
         </div>
       )}
 
-      <div className="relative w-full h-64 rounded-lg border border-[#EBDDCC] overflow-hidden bg-[#E7E2DC]">
+      <div className="relative w-full h-64 rounded-lg border border-line overflow-hidden bg-gray">
         <MapContainer
           center={mapCenter}
           zoom={zoomLevel}
@@ -175,8 +175,8 @@ export const MapPicker: React.FC<MapPickerProps> = ({
           )}
         </MapContainer>
       </div>
-      <p className="text-xs text-[#806D5D]">
-        Sentuh atau klik peta untuk menentukan titik rumah Anda.
+      <p className="text-xs text-muted">
+        Ketuk peta di titik rumah Anda.
       </p>
     </div>
   );

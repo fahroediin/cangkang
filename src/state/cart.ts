@@ -1,4 +1,5 @@
 import { CartItem, Variant } from '../types.ts';
+import { isHalfKgStep } from '../lib/validate.ts';
 
 const CART_KEY = 'tf_cart';
 const CHECKOUT_KEY = 'tf_checkout';
@@ -82,7 +83,7 @@ export function updateCartItemQty(
   if (newQty > 30) {
     return { success: false, error: 'Berat maksimal 30 kg per varian' };
   }
-  if (Math.round(newQty * 10) % 5 !== 0) {
+  if (!isHalfKgStep(newQty)) {
     return { success: false, error: 'Berat harus kelipatan 0,5 kg' };
   }
 
@@ -172,21 +173,34 @@ export function clearCheckoutState(): void {
 }
 
 // Last Orders helpers (P6: max 5)
-export function loadLastOrders(): string[] {
+// Simpan kode + 4 digit terakhir WA: di mode supabase, status hanya bisa dibaca lewat RPC track_order.
+export interface LastOrder {
+  code: string;
+  last4: string;
+}
+
+export function loadLastOrders(): LastOrder[] {
   try {
     const raw = localStorage.getItem(LAST_ORDERS_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((entry) => (typeof entry === 'string' ? { code: entry, last4: '' } : entry))
+      .filter((entry): entry is LastOrder => typeof entry?.code === 'string');
   } catch {
     return [];
   }
 }
 
-export function saveLastOrder(code: string): void {
+export function findLastOrder(code: string): LastOrder | undefined {
+  return loadLastOrders().find((o) => o.code === code && o.last4.length === 4);
+}
+
+export function saveLastOrder(code: string, last4: string): void {
   try {
-    const current = loadLastOrders().filter((c) => c !== code);
-    const updated = [code, ...current].slice(0, 5);
+    const current = loadLastOrders().filter((o) => o.code !== code);
+    const updated = [{ code, last4 }, ...current].slice(0, 5);
     localStorage.setItem(LAST_ORDERS_KEY, JSON.stringify(updated));
   } catch {
     // Ignore

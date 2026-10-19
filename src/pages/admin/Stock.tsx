@@ -4,6 +4,7 @@ import { Staff, Depot, Variant, DepotStock } from '../../types.ts';
 import { dataService } from '../../services/index.ts';
 import { formatKg } from '../../lib/format.ts';
 import { validateStockKg } from '../../lib/validate.ts';
+import { staffErrorMessage } from '../../lib/errors.ts';
 
 export const AdminStock: React.FC = () => {
   const { staff } = useOutletContext<{ staff: Staff }>();
@@ -70,8 +71,8 @@ export const AdminStock: React.FC = () => {
       // AC-10.01: Toast "Stok disimpan"
       setToastMessage('Stok disimpan');
       setTimeout(() => setToastMessage(null), 3000);
-    } catch (err: any) {
-      setRowErrors((prev) => ({ ...prev, [variant.id]: err?.message || 'Gagal menyimpan stok' }));
+    } catch (err) {
+      setRowErrors((prev) => ({ ...prev, [variant.id]: staffErrorMessage(err, 'Gagal menyimpan stok') }));
     }
   };
 
@@ -81,7 +82,7 @@ export const AdminStock: React.FC = () => {
     <div className="flex flex-col gap-5 max-w-4xl">
       {/* Toast */}
       {toastMessage && (
-        <div className="fixed top-16 right-4 z-50 bg-[#33251B] text-white text-sm px-4 py-3 rounded-lg shadow-lg border border-[#EBDDCC]">
+        <div className="fixed top-16 right-4 z-50 bg-ink text-white text-sm px-4 py-3 rounded-lg shadow-[0_4px_12px_rgb(51_37_27/0.12)] border border-line">
           {toastMessage}
         </div>
       )}
@@ -89,22 +90,22 @@ export const AdminStock: React.FC = () => {
       {/* Header & Depo Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-[20px] font-semibold text-[#33251B]">Stok depo</h1>
-          <p className="text-xs text-[#806D5D]">
+          <h1 className="text-[20px] font-semibold text-ink">Stok depo</h1>
+          <p className="text-xs text-muted">
             {currentDepot ? currentDepot.name : 'Depo'} ({currentDepot?.address})
           </p>
         </div>
 
         {isOwner && (
           <div className="flex items-center gap-2">
-            <label htmlFor="stock_depot_select" className="text-sm text-[#806D5D]">
+            <label htmlFor="stock_depot_select" className="text-sm text-muted">
               Depo:
             </label>
             <select
               id="stock_depot_select"
               value={selectedDepotId}
               onChange={(e) => setSelectedDepotId(e.target.value)}
-              className="h-10 px-3 rounded-lg border border-[#94806C] text-sm text-[#33251B] bg-white focus:outline-none focus:border-2 focus:border-[#704529]"
+              className="h-11 px-3 rounded-lg border border-edge text-sm text-ink bg-white focus:outline-none focus:border-2 focus:border-brand"
             >
               {depots.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -117,14 +118,14 @@ export const AdminStock: React.FC = () => {
       </div>
 
       {/* Informative Banner per spec 8.11 */}
-      <div className="p-3 bg-[#FAF5EB] border border-[#EBDDCC] rounded-lg text-xs text-[#806D5D]">
+      <div className="p-3 bg-cream border border-line rounded-lg text-xs text-muted">
         Stok berkurang otomatis saat pesanan masuk dan kembali saat pesanan dibatalkan. Isi angka
         hasil timbang terbaru.
       </div>
 
       {/* Stock Management Table */}
-      <div className="bg-[#FFFFFF] border border-[#EBDDCC] rounded-lg overflow-hidden">
-        <div className="divide-y divide-[#EBDDCC]">
+      <div className="bg-surface border border-line rounded-lg overflow-hidden">
+        <div className="divide-y divide-line">
           {variants.map((v) => {
             const stockRow = stocks.find((s) => s.variant_id === v.id);
             const currentStockKg = stockRow ? stockRow.stock_kg : 0;
@@ -142,35 +143,35 @@ export const AdminStock: React.FC = () => {
             return (
               <div key={v.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-[#33251B]">{v.name}</h3>
-                  <div className="flex items-center gap-3 text-xs text-[#806D5D] mt-1">
+                  <h3 className="text-sm font-semibold text-ink">{v.name}</h3>
+                  <div className="flex items-center gap-3 text-xs text-muted mt-1">
                     <span>
-                      Stok saat ini: <strong className="text-[#33251B] tabular-nums">{formatKg(currentStockKg)}</strong>
+                      Stok saat ini: <strong className="text-ink tabular-nums">{formatKg(currentStockKg)}</strong>
                     </span>
                     <span>&bull;</span>
                     <span>
                       Diperbarui: {updatedTime} {updatedBy ? `(${updatedBy})` : ''}
                     </span>
                   </div>
-                  {error && <span className="text-xs text-[#B3261E] font-medium block mt-1">{error}</span>}
+                  {error && <span className="text-xs text-danger font-medium block mt-1">{error}</span>}
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center border border-[#94806C] rounded-lg px-2 bg-white">
+                  <div className="flex items-center border border-edge rounded-lg px-2 bg-white">
                     <input
                       type="text"
                       inputMode="decimal"
                       value={inputValues[v.id] ?? '0'}
                       onChange={(e) => handleInputChange(v.id, e.target.value)}
-                      className="w-20 h-10 text-center font-semibold text-sm text-[#33251B] tabular-nums bg-transparent focus:outline-none"
+                      className="w-20 h-11 text-center font-semibold text-sm text-ink tabular-nums bg-transparent focus:outline-none"
                     />
-                    <span className="text-xs text-[#806D5D]">kg</span>
+                    <span className="text-xs text-muted">kg</span>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => handleSaveStock(v)}
-                    className="h-10 px-4 rounded-lg bg-[#704529] hover:bg-[#5A3720] text-white font-semibold text-xs transition-colors shrink-0"
+                    className="h-11 px-4 rounded-lg bg-brand hover:bg-brand-hover text-white font-semibold text-xs transition-colors shrink-0"
                   >
                     Simpan stok
                   </button>
