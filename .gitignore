@@ -14,3 +14,4 @@ android/.cxx/
 *.mobileprovision
 .DS_Store
 web/demo/catatan-*.json
+.wrangler/

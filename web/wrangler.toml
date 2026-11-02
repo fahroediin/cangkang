@@ -1,0 +1,19 @@
+# Cloudflare Workers + D1 deployment. Steps: web/cloudflare/DEPLOY-CLOUDFLARE.md
+name = "pamanku"
+main = "cloudflare/access-gate.mjs"
+compatibility_date = "2025-10-01"
+# Version preview URLs would sit outside the Access application; the gate would reject them anyway, so keep them off.
+preview_urls = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pamanku"
+# Fill in with the id printed by: npx wrangler d1 create pamanku
+database_id = "ISI-DATABASE-ID"
+migrations_dir = "drizzle"
+
+[vars]
+# Cloudflare Zero Trust > Settings > Custom Pages: team domain, e.g. "peternakan.cloudflareaccess.com"
+ACCESS_TEAM_DOMAIN = ""
+# Zero Trust > Access > Applications > (this app) > Overview: Application Audience (AUD) Tag
+ACCESS_AUD = ""
