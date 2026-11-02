@@ -1,0 +1,11 @@
+# TelurFarm v4.7 — Ringkasan pesanan interaktif
+
+Web: Batch & varian → Telusuri → Pesanan terkait batch. Mobile: Kelola → Batch → Telusuri asal & cabang. Ringkasan kategori, status dan depo menjadi tombol untuk menyaring daftar. Nilai terpilih bertanda ✓ (web juga memiliki aria-pressed untuk pembaca layar).
+
+Klik kategori untuk mengganti kategori pembeli saja; klik status untuk mengganti filter status saja; klik depo untuk mengganti depo pesanan saja. Pencarian, tanggal, cakupan batch/keluarga dan urutan dipertahankan; halaman kembali pertama. Depo adalah depo pesanan, bukan lokasi stok batch saat ini. Pilihan yang tidak valid atau depo yang tidak lagi ada ditolak sebelum filter diubah.
+
+Semua kategori/Semua status/Semua depo pesanan hanya menghapus filter pada kelompok masing-masing. Reset seluruh filter tetap tersedia untuk kembali default lengkap. Angka ringkasan dihitung dari semua hasil filter saat ini, bukan seluruh database di luar filter. Karena filter lain tetap, memilih angka nol atau kategori/status lain dapat menghasilkan daftar kosong. Kelompok depo hanya menampilkan depo dengan hasil cocok; gunakan Semua depo pesanan atau form untuk memperluas pilihan.
+
+Daftar, ringkasan, CSV rincian, CSV ringkasan dan PDF mengikuti filter yang baru. CSV/PDF tetap laporan statis, tanpa tombol interaktif; preview PDF yang sudah terbuka tetap snapshot lama. Jumlah kolom CSV tetap 21 dan 16. Tindakan hanya mengubah tampilan sesi, tidak mengubah stok/status, mengirim pesan, menambah izin atau migrasi schema. Alokasi bukan volume terkirim/saldo stok dan bukan recall terverifikasi; native masih lokal tanpa sinkronisasi web.
+
+UAT: mulai dari seluruh keluarga, semua status dan tanpa filter tambahan. Klik kategori, status dan depo satu per satu, periksa tanda terpilih dan daftar. Pastikan tanggal/pencarian/cakupan/urutan tetap dan halaman menjadi satu. Uji tombol Semua pada tiap kelompok, angka nol, serta reset lengkap. Uji nama depo berkutip/markup pada lingkungan uji agar teks tidak menjadi HTML. Bandingkan CSV/PDF setelah klik dan pastikan data asli tidak berubah. Uji browser serta Android/iOS nyata dengan share CSV/PDF. Pengujian browser dan perangkat/emulator belum dilakukan pada rilis ini.

@@ -1,0 +1,6 @@
+27 Oktober 2026
+PASS 206 assertions RBAC memakai SQLite in memory nyata, 13 role, ownership CU/DR, pemisahan field, harga server, persetujuan, sumber berubah, pencabutan, token email, idempotensi, concurrency dan rekomendasi.
+PASS 254 tests domain dan penyimpanan native, TypeScript, v3-operations, v3-server, Worker ESM.
+PASS Android export 654 modul, iOS 656 modul. APK/AAB/IPA tidak dibangun.
+QA browser lokal: pembuatan workspace, dashboard OW, daftar anggota, form undangan, stylesheet. Belum UAT seluruh UI role atau hosted multi akun, perangkat nyata, GPS, share, restore.
+Panduan Word enam halaman dirender dan diperiksa seluruh halaman.

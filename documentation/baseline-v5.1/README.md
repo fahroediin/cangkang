@@ -1,0 +1,1 @@
+Dokumen folder ini adalah baseline 5.1. Master Kandang dinamis pada 5.2 menggantikan batas Kandang A/B/C; acuan terkini adalah ../Panduan-Master-Kandang-v5.2.md. Batas login native dan pemisahan data tetap berlaku.

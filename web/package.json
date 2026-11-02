@@ -1,0 +1,13 @@
+{
+  "name": "sites-worker-esm-starter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "validate": "node scripts/validate-artifact.mjs",
+    "dev": "node scripts/dev-team.mjs",
+    "demo": "node scripts/demo-launch.mjs demo",
+    "fgd": "node scripts/demo-launch.mjs fgd"
+  },
+  "version": "6.0.0"
+}

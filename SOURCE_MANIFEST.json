@@ -1,0 +1,44 @@
+{
+  "product": "PamanKu",
+  "previous_name": "TelurFarm",
+  "version": "6.0.0",
+  "web_commit": "714c33b5eb2ae7cd30bc559937c03b95dfe4460b",
+  "android_version_code": 27,
+  "ios_build": 27,
+  "native_sync": false,
+  "population_ledger": true,
+  "team_population_approvals": true,
+  "flock_monitor": true,
+  "saved_monitor_filters": true,
+  "saved_filter_editing": true,
+  "saved_filter_duplication": true,
+  "saved_filter_favorites": true,
+  "house_performance": true,
+  "publication_status": "blocked_repository_http500",
+  "web_commit_pushed": false,
+  "backup_identifiers": "legacy TelurFarm tags retained",
+  "monitor_preferences_schema": 1,
+  "tests": {
+    "v60_assertions": 137,
+    "v59_assertions": 158,
+    "v58_assertions": 117,
+    "v57_assertions": 172,
+    "v56_assertions": 128,
+    "monitor_assertions": 100,
+    "flock_approval_assertions": 269,
+    "flock_assertions": 147,
+    "houses_assertions": 116,
+    "rbac_assertions": 206,
+    "native_tests": 309
+  },
+  "native_bundles": {
+    "android": {
+      "name": "index-84596995346103de3dd1f7b6115d2e7c.hbc",
+      "sha256": "42d3372896c4647c2cdce48bbb314b194d51cd74435b657c2848b31c1352dd51"
+    },
+    "ios": {
+      "name": "index-13b12c50ae189e60df603f796bdbe847.hbc",
+      "sha256": "76cbb272a4ce852cd84a4a6a70bd4788ecd73d95ca6cf0e453af0095632a6ef2"
+    }
+  }
+}

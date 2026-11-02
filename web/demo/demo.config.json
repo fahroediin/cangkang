@@ -1,0 +1,161 @@
+{
+ "format": "fgd",
+ "title": "PamanKu v6.0 · Operasional Peternakan Ayam Petelur",
+ "client": "peserta",
+ "upstream": "http://localhost:3100",
+ "port": 3000,
+ "home": "/team.html",
+ "steps": "steps.json",
+ "questions": "questions.json",
+ "durationMinutes": 90,
+ "theme": {
+  "primary": "#704529",
+  "accent": "#f8c54b",
+  "font": "Arial, sans-serif"
+ },
+ "roles": [
+  {
+   "key": "ow",
+   "name": "Bu Sari (Pemilik)",
+   "role": "OW",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "ow"
+   }
+  },
+  {
+   "key": "om",
+   "name": "Pak Budi (Manajer Operasional)",
+   "role": "OM",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "om"
+   }
+  },
+  {
+   "key": "fa",
+   "name": "Joko (Operator Farm)",
+   "role": "FA",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "fa"
+   }
+  },
+  {
+   "key": "qc",
+   "name": "Rina (Petugas Mutu)",
+   "role": "QC",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "qc"
+   }
+  },
+  {
+   "key": "dp",
+   "name": "Agus (Operator Depo)",
+   "role": "DP",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "dp"
+   }
+  },
+  {
+   "key": "sl",
+   "name": "Dewi (Penjualan)",
+   "role": "SL",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "sl"
+   }
+  },
+  {
+   "key": "fn",
+   "name": "Lina (Keuangan)",
+   "role": "FN",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "fn"
+   }
+  },
+  {
+   "key": "ds",
+   "name": "Hendra (Koordinator Distribusi)",
+   "role": "DS",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "ds"
+   }
+  },
+  {
+   "key": "dr",
+   "name": "Udin (Kurir)",
+   "role": "DR",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "dr"
+   }
+  },
+  {
+   "key": "cs",
+   "name": "Maya (Layanan Pelanggan)",
+   "role": "CS",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "cs"
+   }
+  },
+  {
+   "key": "au",
+   "name": "Pak Teguh (Auditor, 2 usaha)",
+   "role": "AU",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "au"
+   }
+  },
+  {
+   "key": "sa",
+   "name": "Admin Sistem",
+   "role": "SA",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "sa"
+   }
+  },
+  {
+   "key": "cu",
+   "name": "Toko Berkah (Pelanggan)",
+   "role": "CU",
+   "group": "Peternakan Demo Banten",
+   "cookies": {
+    "pamanku_demo": "cu"
+   }
+  },
+  {
+   "key": "ow2",
+   "name": "Pak Hasan (Pemilik usaha lain)",
+   "role": "OW",
+   "group": "Peternakan Maju Serang",
+   "cookies": {
+    "pamanku_demo": "ow2"
+   }
+  },
+  {
+   "key": "fa2",
+   "name": "Rudi (Operator Farm usaha lain)",
+   "role": "FA",
+   "group": "Peternakan Maju Serang",
+   "cookies": {
+    "pamanku_demo": "fa2"
+   }
+  }
+ ],
+ "notes": [
+  "Dua mode dari folder web: npm run demo (Panduan Demo: tombol langkah, Sebelumnya/Berikutnya, Catatan) dan npm run fgd (Panduan FGD format FIF). Data demo dibuat ulang setiap start; catatan tetap tersimpan di demo/catatan-demo.json dan demo/catatan-fgd.json sampai dikosongkan.",
+  "Pesanan contoh semuanya bertanggal hari ini karena sistem tidak menerima tanggal kirim di masa lalu.",
+  "Tampilan di HP masih perlu digeser ke samping; presentasi utama pakai laptop.",
+  "Pada pesanan selesai, tombol seperti Mulai pengiriman masih tampil; bila diklik, server menolak. Ini perilaku aplikasi saat ini.",
+  "Halaman Aktivitas menampilkan ID akun (mis. demo-fn), belum nama orang.",
+  "Form Hitung dan timbang mewajibkan Catatan pemeriksaan."
+ ]
+}

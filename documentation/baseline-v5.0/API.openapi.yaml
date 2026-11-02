@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: TelurFarm Hosted State API
+  version: 5.0.0
+  description: Requires trusted Sites gateway identity. Not a public mobile login API. Full state snapshots are validated by source code.
+paths:
+  /api/state:
+    get:
+      summary: Read state for authenticated gateway user
+      responses:
+        '200':
+          description: userId email revision updatedAt and data or null
+        '401':
+          description: Trusted gateway identity missing
+        '503':
+          description: DB binding unavailable
+    post:
+      summary: Save complete web state with optimistic revision check
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [expectedRevision, data]
+              properties:
+                expectedRevision:
+                  type: integer
+                  minimum: 0
+                data:
+                  type: object
+                  description: Complete web state accepted by validateBackup not a partial order
+      responses:
+        '200':
+          description: New revision and updatedAt
+        '400':
+          description: Invalid JSON or revision
+        '401':
+          description: Trusted gateway identity missing
+        '403':
+          description: Origin rejected
+        '409':
+          description: Revision conflict
+        '413':
+          description: Payload too large approximately 1.5 MB
+        '415':
+          description: Content type rejected
+        '422':
+          description: Business state validation failed
+        '503':
+          description: DB binding unavailable

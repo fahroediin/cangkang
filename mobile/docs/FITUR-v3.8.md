@@ -1,0 +1,11 @@
+# TelurFarm v3.8 — Laporan PDF pesanan terkait batch
+
+Web: Batch & varian → Telusuri → Pesanan terkait batch. Mobile: Kelola → Batch → Telusuri asal & cabang. Ringkasan baru menghitung pesanan menurut kategori pembeli (Perorangan/Wholesale/Hotel/Resort) dan status serta jumlah ID batch dengan alokasi cocok. Setiap pesanan dihitung sekali pada masing-masing pengelompokan. Jangan menjumlahkan kedua tabel sebagai total pesanan baru.
+
+Web: pilih cakupan dan status, tekan Laporan pesanan cetak / PDF, tunggu preview siap, lalu Cetak / Simpan PDF melalui dialog browser. Kembali ke telusur mempertahankan filter dan memperbarui daftar. Mobile: pilih Bagikan pesanan batch PDF, lalu simpan melalui menu berbagi. CSV v3.7 tetap tersedia.
+
+Laporan A4 landscape memuat batch dipilih, akar keluarga, cakupan, filter status, waktu UTC, ringkasan serta rincian pesanan/pelanggan/kategori/status/tanggal/depo/ID batch dan kg-butir alokasi cocok. Data diambil saat tombol laporan ditekan; preview cetak memakai snapshot yang sama walau data berubah kemudian. Buka ulang laporan untuk snapshot baru. Laporan kosong tetap berisi metadata, ringkasan nol dan keterangan kosong. Nilai teks di-escape agar tidak menjadi markup/script.
+
+Alokasi bukan jumlah terkirim, saldo stok atau volume penarikan. Referensi pembatalan dapat tetap ada; retur tidak dikurangkan. Pesanan tanpa referensi batch tidak ditemukan. Cakupan keluarga termasuk akar dan saudara, bukan bukti semua pesanan terdampak masalah kualitas. Laporan bukan recall terverifikasi, bukti asal panen atau cadangan pemulihan. Tidak mengubah stok/status dan tidak mengirim pesan. Native tetap lokal tanpa sinkronisasi web. Tidak ada migrasi schema atau izin baru.
+
+UAT: pilih batch/family dan semua/tanpa dibatalkan; bandingkan ringkasan dengan rincian. Coba order multi-alokasi: satu pesanan tetap dihitung sekali. Cetak PDF banyak halaman, cek header berulang dan ID panjang tidak terpotong. Buka preview, ubah data dari sumber lain, pastikan snapshot preview tetap; kembali lalu buka ulang untuk data terbaru. Uji kosong dan nama berisi markup. Uji simpan/share PDF Android/iOS pada perangkat nyata. Browser dan perangkat/emulator belum diuji pada rilis ini.

@@ -1,0 +1,13 @@
+# TelurFarm v4.0 — Pencarian dan halaman pesanan terkait batch
+
+Buka Batch & varian → Telusuri → Pesanan terkait batch (web), atau Kelola → Batch → Telusuri asal & cabang → Cari & filter pesanan batch (mobile). Cari sebagian nomor pesanan atau nama pelanggan, maksimal 100 karakter setelah spasi disamakan. Pencarian mengabaikan kapital, menyamakan Unicode NFKC serta spasi berulang, dan memperlakukan karakter seperti .* sebagai teks biasa (bukan regex). Cocok jika seluruh teks pencarian ditemukan pada salah satu nomor atau nama; bukan pencarian per kata terpisah. Kosongkan pencarian untuk semua nomor/nama.
+
+Pencarian digabungkan dengan kategori pembeli, tanggal pengiriman inklusif, cakupan batch/keluarga dan filter pembatalan. Perubahan kolom web baru berlaku setelah Terapkan pencarian & filter. Kesalahan tidak mengubah filter yang sudah diterapkan. Reset pencarian, kategori & tanggal mempertahankan cakupan/status. Membuka telusur ulang mengembalikan default.
+
+Daftar menampilkan 20 pesanan per halaman, urut tanggal kirim lalu ID seperti sebelumnya. Sebelumnya/Berikutnya hanya mengubah bagian daftar yang terlihat. Mengubah filter kembali ke halaman pertama; halaman dijepit ke halaman terakhir jika hasil menyusut. Hasil kosong ditampilkan 0–0, halaman 1/1. Ringkasan, CSV dan PDF mencakup seluruh hasil filter, bukan hanya halaman yang terlihat. Ekspor tetap membaca snapshot terkini saat tombol ditekan; preview PDF tetap memakai snapshot saat dibuka.
+
+CSV menambahkan kolom pencarian nomor/nama di akhir sehingga total 19 kolom; 18 kolom lama tetap pada posisi semula. Laporan kosong tetap menyimpan metadata. PDF mencantumkan pencarian dan menjelaskan bahwa seluruh halaman dicakup. Nama atau pencarian berisi markup di-escape; formula CSV dinetralkan.
+
+Tidak mengubah stok/status, melakukan recall, mengirim pesan, menambah izin atau migrasi schema. Native masih lokal dan belum sinkron dengan web. Alokasi bukan volume terkirim atau saldo stok; retur tidak dikurangkan dan referensi batal dapat tetap ada. Daftar bukan recall terverifikasi.
+
+UAT: coba nomor/nama dengan kapital/spasi berbeda dan karakter literal seperti .*; kombinasi semua filter; pencarian kosong dan terlalu panjang. Buat >40 pesanan cocok, telusuri tiga halaman dan pastikan tidak ada duplikasi/hilang. Pastikan ringkasan/CSV/PDF mencakup seluruh hasil, termasuk halaman lain; cek nomor halaman kembali satu saat filter berubah. Uji kondisi kosong, hasil menyusut, reset dan buka ulang. Uji browser dan perangkat nyata Android/iOS beserta share CSV/PDF. Pengujian browser dan perangkat/emulator belum dilakukan pada rilis ini.

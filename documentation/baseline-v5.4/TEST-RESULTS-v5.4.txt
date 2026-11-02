@@ -1,0 +1,6 @@
+27 Oktober 2026
+PASS 269 assertions persetujuan; 147 regresi ledger; 116 Master Kandang; 206 RBAC.
+PASS prior web/server operations and Worker ESM validation.
+PASS TypeScript and 266 native tests.
+PASS Android/iOS Expo exports. No APK/AAB/IPA build, physical device or full hosted multi-role UAT.
+Browser local: create workspace/house, propose in 20 chickens, pending status, population stays 100, no self-approval button; visual inspected.

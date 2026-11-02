@@ -1,0 +1,11 @@
+# TelurFarm v4.8 — Kembali sebelum klik ringkasan
+
+Buka pesanan terkait batch melalui Batch & varian → Telusuri (web), atau Kelola → Batch → Telusuri asal & cabang (native). Klik kategori/status/depo atau tombol Semua pada ringkasan. Tombol Kembali sebelum klik ringkasan menjadi aktif.
+
+Kembali memulihkan cakupan batch/keluarga, status, kategori, pencarian, tanggal, depo, urutan dan halaman tepat sebelum klik ringkasan terakhir. Hanya satu langkah: klik ringkasan berikutnya mengganti riwayat sebelumnya; setelah Kembali berhasil, riwayat habis dan tombol nonaktif. Navigasi halaman, membuka detail pesanan dan ekspor tidak menghapus riwayat. Filter manual yang berhasil diterapkan, perubahan cakupan/status langsung, pilihan cepat, reset sebagian/seluruh filter, dan membuka telusur ulang menghapus riwayat. Validasi yang gagal mempertahankan riwayat lama.
+
+Riwayat hanya menyimpan tampilan untuk sesi dan batch yang sama, bukan data transaksi. Saat Kembali, daftar dan ringkasan dihitung ulang dengan data terkini. Halaman dijepit ke halaman terakhir bila jumlah hasil berkurang; hasil kosong menjadi halaman 1/1. Depo riwayat yang sudah tidak tersedia atau riwayat untuk batch lain ditolak sebelum filter berubah. CSV/PDF sesudah Kembali memakai filter yang dipulihkan; preview PDF yang sudah terbuka tetap snapshot saat dibuat.
+
+Tidak membatalkan transaksi, mengubah stok/status, mengirim pesan atau menambah schema/izin. Riwayat tidak ikut cadangan JSON dan tidak disimpan setelah aplikasi ditutup. CSV rincian/ringkasan tetap 21/16 kolom. Alokasi bukan jumlah terkirim/saldo stok dan bukan recall terverifikasi; native masih lokal tanpa sinkronisasi web.
+
+UAT: buat >20 hasil, buka halaman dua, klik ringkasan lalu Kembali; pastikan filter dan halaman dua pulih. Klik dua kelompok berurutan, pastikan hanya klik terakhir yang bisa kembali. Uji perubahan data yang mengurangi hasil sebelum Kembali; pastikan data terkini dan halaman dijepit. Uji invalid filter/riwayat, reset, pilihan cepat, buka detail, ekspor dan telusur ulang. Periksa PDF/CSV sesudah Kembali dan pastikan transaksi asli tidak berubah. Uji browser dan perangkat Android/iOS nyata. Pengujian browser dan perangkat/emulator belum dilakukan pada rilis ini.

@@ -1,0 +1,16 @@
+node_modules/
+Pods/
+.expo/
+artifacts/
+.gradle/
+android/.cxx/
+*.db
+*.sqlite*
+.env
+.env.*
+!.env.example
+*.jks
+*.p12
+*.mobileprovision
+.DS_Store
+web/demo/catatan-*.json

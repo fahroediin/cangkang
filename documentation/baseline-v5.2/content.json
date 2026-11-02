@@ -1,0 +1,315 @@
+[
+  {
+    "title": "Hasil rilis dan batas penggunaan",
+    "blocks": [
+      {
+        "p": "TelurFarm 5.1 menambahkan portal ruang kerja tim pada /team.html dengan pemeriksaan peran dan cakupan di backend Worker. Portal mengelola anggota, transaksi inti dan persetujuan tanpa menerima snapshot transaksi dari anggota. Gunakan dokumen ini sebagai panduan versi yang benar-benar diimplementasikan; dokumen matriks 5.0 sebelumnya tetap rancangan target yang lebih luas."
+      },
+      {
+        "p": "Data tim dimulai kosong dan terpisah dari area pribadi web 5.0 serta SQLite native. Data lama tidak disalin atau digabungkan otomatis. Native 5.1.0 menyediakan tombol menuju portal melalui browser sistem; mode lokal belum memiliki login multiuser, RBAC offline atau sinkronisasi ke portal. APK AAB dan IPA belum dibangun."
+      },
+      {
+        "p": "Akses hosting tetap owner private. Undangan aplikasi tidak otomatis mengizinkan seseorang melewati akses hosting. Pemilik perlu memberikan akses Site hanya kepada orang yang memang ditetapkan memakai aplikasi; rilis ini tidak mengubah audience dan tidak mengirim undangan kepada orang sungguhan."
+      }
+    ]
+  },
+  {
+    "title": "Peran yang tersedia di server",
+    "blocks": [
+      {
+        "table": {
+          "headers": [
+            "Kode",
+            "Peran",
+            "Fungsi aktif utama"
+          ],
+          "rows": [
+            [
+              "OW",
+              "Pemilik usaha",
+              "Mengundang dan mencabut anggota, membaca laporan, menyetujui operasional dan keuangan, ekspor transaksi"
+            ],
+            [
+              "SA",
+              "Administrator sistem",
+              "Meninjau anggota dan aktivitas; tanpa data bisnis dan tanpa pemberian role langsung"
+            ],
+            [
+              "OM",
+              "Manajer operasional",
+              "Meninjau produksi dan stok, mengajukan stok atau lokasi depo serta menyetujui operasional"
+            ],
+            [
+              "FA",
+              "Operator farm",
+              "Mencatat produksi dalam scope kandang dan depo, mengajukan stok dan biaya"
+            ],
+            [
+              "QC",
+              "Petugas mutu",
+              "Meninjau batch dan menetapkan mutu; berbeda dari pencatat produksi"
+            ],
+            [
+              "DP",
+              "Operator depo",
+              "Packing fisik, permintaan stok, pelaksanaan transfer atau koreksi dan penerimaan retur disetujui"
+            ],
+            [
+              "SL",
+              "Penjualan",
+              "Pesanan kg atau butir, permintaan harga dan pembatalan, melihat saldo yang diperlukan"
+            ],
+            [
+              "FN",
+              "Keuangan",
+              "Pembayaran manual, permintaan kredit refund biaya, pelaksanaan keuangan disetujui"
+            ],
+            [
+              "DS",
+              "Koordinator distribusi",
+              "Penugasan kurir aktif, mulai pengiriman dan penerimaan dengan alasan override"
+            ],
+            [
+              "DR",
+              "Kurir",
+              "Hanya kiriman yang ditugaskan; mulai antar, catat penerima dan keluhan tanpa harga atau piutang"
+            ],
+            [
+              "CS",
+              "Layanan pelanggan",
+              "Buka dan tutup kasus, ajukan kredit, melihat saldo yang diperlukan"
+            ],
+            [
+              "AU",
+              "Auditor",
+              "Baca data dan ekspor laporan sesuai scope tanpa mengubah transaksi"
+            ],
+            [
+              "CU",
+              "Pelanggan",
+              "Pesanan dan keluhan sendiri, harga sesuai kategori pelanggan, melihat tagihan sendiri"
+            ]
+          ]
+        }
+      },
+      {
+        "p": "Setiap keanggotaan memiliki satu role. Pemilik otomatis OW saat membuat ruang kerja; OW tidak bisa diberikan lewat undangan dan tidak bisa dicabut melalui aplikasi. Kategori Perorangan, Wholesale dan Hotel/Resort ditentukan pemilik ketika mengundang CU. Kategori tersebut tidak memberi hak akses operasional. Perubahan role atau scope anggota dilakukan dengan mencabut lalu membuat undangan baru."
+      }
+    ]
+  },
+  {
+    "title": "Langkah mulai dan mengundang anggota",
+    "blocks": [
+      {
+        "p": "1. Buka URL Site, pilih Tim dan akses v5.1 atau langsung buka /team.html, lalu masuk menggunakan akun ChatGPT yang diperbolehkan oleh hosting. 2. Pemilik membuat ruang kerja usaha kosong dengan nama usaha dan nama tampilan. Satu pembuat memiliki maksimal satu ruang kerja miliknya; ia tetap dapat menjadi anggota ruang kerja lain."
+      },
+      {
+        "p": "3. Buka Anggota dan akses lalu Undang anggota. Isi email akun yang benar, role, cakupan depo dan kandang serta kategori untuk CU. Pilih scope yang diperlukan. Pilihan Semua memberi akses lintas unit dalam ruang kerja, bukan akses usaha lain. 4. Konfirmasi dan salin tautan yang muncul satu kali. Bagikan melalui kanal yang dikelola usaha; aplikasi tidak mengirim email otomatis."
+      },
+      {
+        "p": "5. Penerima membuka tautan, masuk dengan email yang ditetapkan dan mengisi nama tampilan. Undangan berlaku 72 jam, sekali pakai dan bisa dicabut pemilik. Email lain, undangan yang dipakai atau kadaluarsa ditolak. 6. Pemilik meninjau anggota aktif dan menguji menu sesuai role. Pengguna tidak memilih role untuk menaikkan aksesnya sendiri."
+      },
+      {
+        "p": "Saat pengguna pindah tugas atau berhenti, OW mencabut akses. Permintaan berikutnya diperiksa lagi di server walaupun halaman lama masih terbuka. Pencabutan tidak menghapus histori transaksi. Akun milik staf bukan akun bersama dengan pemilik."
+      }
+    ]
+  },
+  {
+    "title": "Alur operasi tim",
+    "blocks": [
+      {
+        "p": "FA mencatat tanggal, kandang, depo, telur baik, berat, rusak, konsumsi pakan dan kematian. Produksi menghasilkan batch karantina. QC memeriksa kondisi, varian dan tanggal yang benar-benar diketahui lalu menentukan mutu. QC tidak boleh melepas batch yang produksinya ia catat sendiri, termasuk batch anak transfer yang masih mengacu pencatat asal."
+      },
+      {
+        "p": "SL atau CU membuat pesanan dengan kg atau butir; formulir mendukung tiga varian dengan satuan masing-masing. Isi nol untuk varian yang tidak dipesan. Harga diturunkan dari server; CU tidak bisa memakai kategori lain melalui payload. Stok dialokasikan FEFO. Pesanan hanya dapat disimpan jika saldo dan varian memenuhi kebutuhan."
+      },
+      {
+        "p": "Cari depo terdekat memakai lokasi perangkat sebagai tujuan, sehingga operator harus memastikan titik tersebut benar-benar alamat pelanggan. Hasil dibatasi cakupan dan ketersediaan varian. Jarak berupa garis lurus, bukan rute jalan. Jika izin lokasi ditolak, verifikasi alamat dan pilih depo secara manual. Koordinat awal adalah contoh; OM mengajukan lokasi serta radius dan OW menyetujuinya sebelum dipakai nyata."
+      },
+      {
+        "p": "DP menghitung dan menimbang alokasi fisik per batch pada pesanan. DS menugaskan anggota DR yang aktif dan memenuhi scope depo. DR hanya melihat kirimannya sendiri dan tidak menerima field harga atau piutang. Pengiriman membutuhkan packing, tanggal yang sah serta batch layak. Penerimaan mencatat nama penerima; penerimaan oleh DS memerlukan alasan."
+      },
+      {
+        "p": "FN mencatat dana yang benar-benar diterima, tanggal dan referensi. CS atau pelanggan membuka kasus terkait pesanan yang boleh diakses. Retur, kredit dan refund mengikuti persetujuan terpisah. CS tidak dapat menutup kasus yang masih mempunyai hak refund belum selesai. Tidak ada transfer bank otomatis atau payment gateway."
+      }
+    ]
+  },
+  {
+    "title": "Matriks permintaan dan persetujuan",
+    "blocks": [
+      {
+        "table": {
+          "headers": [
+            "Jenis",
+            "Pembuat",
+            "Pemeriksa dan pelaksana"
+          ],
+          "rows": [
+            [
+              "Transfer dan koreksi",
+              "FA OM atau DP",
+              "OM atau OW menyetujui; DP menjalankan"
+            ],
+            [
+              "Pembatalan",
+              "SL",
+              "OM atau OW menyetujui; SL menjalankan; hanya sebelum kirim dan belum dibayar"
+            ],
+            [
+              "Harga kategori",
+              "SL semua depo",
+              "OW menyetujui; FN semua depo menjalankan"
+            ],
+            [
+              "Biaya",
+              "FA OM atau FN semua depo",
+              "OW menyetujui; FN semua depo menjalankan"
+            ],
+            [
+              "Nota kredit",
+              "CS atau FN",
+              "OW menyetujui; FN menjalankan"
+            ],
+            [
+              "Refund dana",
+              "FN",
+              "OW menyetujui; FN menjalankan setelah dana benar-benar dikembalikan"
+            ],
+            [
+              "Retur fisik",
+              "FA OM atau DP sesuai pesanan",
+              "OM atau OW menyetujui; DP menerima ke karantina"
+            ],
+            [
+              "Lokasi depo",
+              "OM",
+              "OW menyetujui; OM menjalankan"
+            ]
+          ]
+        }
+      },
+      {
+        "p": "Pembuat dan penyetuju harus pengguna berbeda. Pelaksana boleh sama dengan pembuat setelah ada persetujuan sah. Setiap permintaan menyimpan parameter dan versi sumber. Jika stok, pesanan, pembayaran atau referensi terkait berubah, persetujuan lama tidak dapat dieksekusi. Anggota pembuat dan pemeriksa harus masih aktif serta mempunyai hak yang sesuai saat pelaksanaan."
+      },
+      {
+        "p": "Buka Persetujuan untuk mengajukan, menyetujui atau menolak sesuai role. Pelaksana menekan Jalankan pada permintaan approved. Menyetujui belum mengubah stok atau keuangan. Pembuat dapat menarik permintaan pending atau approved. Untuk data sumber berubah, tarik permintaan lama lalu ajukan ulang. Tidak ada pengecualian nominal otomatis pada versi ini."
+      },
+      {
+        "p": "Permintaan harga dan biaya bersifat global sehingga membutuhkan cakupan Semua depo. Operator dengan scope terbatas belum dapat mengajukan biaya lokal di portal. Ini batas implementasi 5.1 yang lebih sempit dari matriks target 5.0."
+      }
+    ]
+  },
+  {
+    "title": "Arsitektur dan kontrak akses",
+    "blocks": [
+      {
+        "p": "Web pribadi tetap memakai telurfarm_state dan /api/state per user_id. Tim memakai tabel D1 telurfarm_teams dengan id, owner_id unik, revision dan payload. Payload memuat data transaksi schema native 2, anggota, hash undangan, permintaan, scope produksi, pencatat batch, pemilik pesanan, aktivitas dan kunci idempotensi. Data bersama tidak dikirim utuh kepada semua anggota."
+      },
+      {
+        "table": {
+          "headers": [
+            "Endpoint",
+            "Metode",
+            "Perilaku"
+          ],
+          "rows": [
+            [
+              "/api/team/me",
+              "GET",
+              "Identitas dan daftar ruang kerja yang anggotanya aktif"
+            ],
+            [
+              "/api/team/create",
+              "POST",
+              "Membuat ruang kerja kosong milik identitas yang masuk"
+            ],
+            [
+              "/api/team/view",
+              "GET",
+              "Proyeksi data sesuai role dan scope"
+            ],
+            [
+              "/api/team/invite",
+              "POST",
+              "OW membuat undangan; token mentah dikembalikan satu kali"
+            ],
+            [
+              "/api/team/join",
+              "POST",
+              "Terima token yang cocok dengan email dan masih berlaku"
+            ],
+            [
+              "/api/team/action",
+              "POST",
+              "Command terbatas termasuk permintaan, persetujuan dan eksekusi"
+            ],
+            [
+              "/api/team/recommend",
+              "POST",
+              "Rekomendasi depo untuk order.create dalam scope"
+            ],
+            [
+              "/api/team/export",
+              "GET",
+              "Backup transaksi OW atau laporan JSON sesuai scope AU"
+            ]
+          ]
+        }
+      },
+      {
+        "p": "Command menyertakan teamId, expectedRevision, requestId, action dan params. Server menentukan identitas dari gateway tepercaya, tidak menerima role atau scope dari client. Setiap perubahan snapshot, ACL dan aktivitas berhasil disimpan dengan CAS pada satu baris sehingga perubahan bersamaan hanya menghasilkan satu pemenang. Pengulangan requestId yang sama dalam jendela 500 command tidak menggandakan transaksi; ID yang sama dengan isi berbeda ditolak."
+      },
+      {
+        "p": "Respons API tidak disimpan browser sebagai cache transaksi dan memakai Cache Control no store. Token undangan disimpan sebagai hash SHA 256 di database. Tautan memakai fragmen dan dibersihkan dari URL saat diproses. Handler hosted harus tetap berada di belakang gateway tepercaya; server development dengan identitas tetap tidak boleh dipakai produksi."
+      },
+      {
+        "p": "Kode 401 berarti sesi tidak tersedia, 403 berarti izin scope atau asal ditolak, 409 konflik revisi atau sumber, 413 batas payload dan 422 input atau aturan bisnis gagal. Muat ulang setelah konflik dan jangan mengirim snapshot lama secara paksa."
+      }
+    ]
+  },
+  {
+    "title": "Mobile dan kompatibilitas data",
+    "blocks": [
+      {
+        "p": "Native memakai versi 5.1.0, Android versionCode 18 dan iOS build 18. Pada menu Kelola pilih Buka portal tim online. Browser sistem menangani sesi ChatGPT dan portal responsif. Data SQLite, invoice serta laporan lokal tetap berada pada mode pribadi. Tombol ini bukan WebView atau login API native langsung."
+      },
+      {
+        "p": "Tidak ada migrasi otomatis dari data pribadi web atau SQLite ke tim. Portal baru tidak mewarisi seluruh fitur penelusuran, peringatan stok dan filter tersimpan 5.0. Fitur tersebut tetap tersedia di area pribadi. Native belum bisa memproses approval offline atau menyinkronkan command lokal. Jangan memakai mode lokal pada perangkat bersama sebagai pengganti kontrol akses tim."
+      },
+      {
+        "p": "Ekspor OW dari portal adalah transaksi schema native 2 yang dapat ditinjau dengan tooling domain native; bukan backup ruang kerja lengkap. Anggota, scope, undangan dan persetujuan tidak ikut. Ekspor AU adalah laporan JSON tersaring dan tidak dapat dipakai restore. Tidak ada fasilitas restore portal pada 5.1; cadangan dan pemulihan lengkap D1 harus dikelola administrator melalui prosedur lingkungan."
+      }
+    ]
+  },
+  {
+    "title": "Pemasangan dan pemeriksaan",
+    "blocks": [
+      {
+        "p": "Paket source berisi web, Worker, shared native domain, SQL, mobile, tes dan panduan ini. Jalankan pemeriksaan checksum sebelum memasang dependency. Gunakan Node 24 dengan node sqlite, npm dan Python 3. Dependency mobile dipasang dari package lock. Build web memakai sumber domain JavaScript yang sudah dihasilkan; bila mengubah domain TypeScript, jalankan generator dengan TypeScript dari dependency mobile."
+      },
+      {
+        "code": "cd web\npython3 scripts/embed-worker.py\nnpm run build\nnode tests/v3-operations.cjs\nnode tests/v3-server.mjs\nnode tests/v51-rbac.mjs\nnpm run validate\n# Native dari akar paket\ncd ../mobile\nnpm ci\nnpm run typecheck\nnpm test"
+      },
+      {
+        "p": "DDL 0001_team_rbac.sql bersifat additive dan tabel juga dibuat IF NOT EXISTS saat akses API tim. Jangan menghapus tabel pribadi ketika menerapkan rilis. Source paket development tidak membawa project_id produksi; daftarkan proyek serta DB yang sesuai. Rujuk README untuk server development yang memakai SQLite in memory dan identitas dummy, lalu bedakan secara jelas dari hosting produksi."
+      },
+      {
+        "p": "Verifikasi rilis mencakup 206 assertion RBAC dengan SQLite nyata, 254 tes domain atau penyimpanan native, TypeScript, tes operasi dan server lama, build Worker serta validasi ESM. Android 654 modul dan iOS 656 modul berhasil diekspor. Browser preview lokal diperiksa untuk pembuatan ruang kerja, menu pemilik, formulir undangan dan stylesheet. UI seluruh role di browser, alur undangan hosted nyata, GPS, perangkat fisik, APK IPA dan pemulihan D1 belum UAT."
+      }
+    ]
+  },
+  {
+    "title": "Batas kapasitas dan pekerjaan berikutnya",
+    "blocks": [
+      {
+        "p": "Batas saat ini adalah satu ruang kerja milik setiap pembuat, 100 anggota, 30 undangan aktif, 100 permintaan terbuka, payload 1,4 MB, 500 kunci command dan 1.000 aktivitas berhasil terbaru. Aktivitas ini belum audit eksternal permanen dan tidak mencatat setiap upaya akses gagal. Belum ada benchmark beban, SLA atau uji penetrasi independen."
+      },
+      {
+        "p": "SA hanya mempunyai akses daftar anggota dan aktivitas; OW tetap pengelola pemberian role. Belum ada multi role, delegasi kepemilikan, reset MFA, restore UI atau master farm umum. Struktur awal tiga depo dan tiga nama kandang. Scope produksi pada versi ini memakai kandang serta depo, bukan hierarki multi farm yang bebas."
+      },
+      {
+        "p": "Tahap berikutnya memerlukan UAT multi akun dengan audience hosting yang ditetapkan pemilik, migrasi data yang direkonsiliasi, autentikasi dan sinkron native, perluasan menu tim, audit permanen serta pemulihan lengkap. Jangan menyatakan seluruh matriks rancangan 5.0 telah aktif hanya karena nama rolenya sudah tersedia."
+      }
+    ]
+  }
+]

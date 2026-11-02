@@ -1,0 +1,127 @@
+{
+  "OW": [
+    "Pemilik Usaha",
+    "house.read",
+    "house.manage",
+    "house.assign",
+    "overview",
+    "stock.read",
+    "production.read",
+    "orders.read",
+    "finance.read",
+    "prices.read",
+    "members.read",
+    "members.manage",
+    "approve.financial",
+    "approve.operational",
+    "backup",
+    "audit"
+  ],
+  "SA": [
+    "Administrator Sistem",
+    "members.read",
+    "audit"
+  ],
+  "OM": [
+    "Manajer Operasional",
+    "house.read",
+    "house.manage",
+    "overview",
+    "stock.read",
+    "production.read",
+    "orders.read",
+    "prices.read",
+    "approve.operational",
+    "stock.request",
+    "expense.request",
+    "depot.request"
+  ],
+  "FA": [
+    "Operator Farm",
+    "house.read",
+    "production.read",
+    "production.create",
+    "stock.read",
+    "stock.request",
+    "expense.request"
+  ],
+  "QC": [
+    "Petugas Mutu",
+    "stock.read",
+    "lot.quality",
+    "orders.read"
+  ],
+  "DP": [
+    "Operator Depo",
+    "stock.read",
+    "stock.request",
+    "stock.execute",
+    "orders.read",
+    "order.pack",
+    "return.execute"
+  ],
+  "SL": [
+    "Penjualan",
+    "stock.read",
+    "orders.read",
+    "order.create",
+    "cancel.request",
+    "prices.read",
+    "price.request",
+    "case.create",
+    "balance.read"
+  ],
+  "FN": [
+    "Keuangan",
+    "orders.read",
+    "finance.read",
+    "payment.post",
+    "credit.request",
+    "refund.request",
+    "financial.execute",
+    "expense.request",
+    "prices.read"
+  ],
+  "DS": [
+    "Koordinator Distribusi",
+    "orders.read",
+    "courier.assign",
+    "order.dispatch",
+    "order.receive"
+  ],
+  "DR": [
+    "Kurir",
+    "orders.read",
+    "order.dispatch",
+    "order.receive",
+    "case.create"
+  ],
+  "CS": [
+    "Layanan Pelanggan",
+    "orders.read",
+    "case.create",
+    "case.resolve",
+    "credit.request",
+    "balance.read"
+  ],
+  "AU": [
+    "Auditor",
+    "house.read",
+    "overview",
+    "stock.read",
+    "production.read",
+    "orders.read",
+    "finance.read",
+    "prices.read",
+    "audit",
+    "members.read",
+    "export"
+  ],
+  "CU": [
+    "Pelanggan",
+    "orders.read",
+    "order.create",
+    "prices.read",
+    "case.create"
+  ]
+}

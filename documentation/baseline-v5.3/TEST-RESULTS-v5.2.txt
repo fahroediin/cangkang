@@ -1,0 +1,5 @@
+27 Oktober 2026
+PASS 116 assertions Master Kandang: role/scope, create/update/status, assignment, stable ID, history, migration, population and concurrent CAS.
+PASS 206 RBAC assertions and all prior web/server operations tests.
+PASS 259 native tests and TypeScript. Android 654 modules / iOS 656 modules exported.
+Browser QA local: create workspace, create Kandang D, saved metadata/table, deactivate form. No full multi-role hosted UAT, mobile devices or APK/IPA build.
