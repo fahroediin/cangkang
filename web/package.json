@@ -10,7 +10,10 @@
     "fgd": "node scripts/demo-launch.mjs fgd",
     "cf:test": "node cloudflare/access-gate.test.mjs",
     "cf:migrate": "npx wrangler@4 d1 migrations apply pamanku --remote",
-    "cf:deploy": "npx wrangler@4 deploy"
+    "cf:deploy": "npx wrangler@4 deploy",
+    "cf:demo:test": "node cloudflare/demo-worker.test.mjs",
+    "cf:demo:reset": "node scripts/demo-cf-reset.mjs",
+    "cf:demo:deploy": "npx wrangler@4 deploy --config wrangler.demo.toml"
   },
   "version": "6.0.0"
 }

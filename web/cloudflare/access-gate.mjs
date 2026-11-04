@@ -42,17 +42,26 @@ export async function verifyAccessToken(token,{domain,aud,fetchKeys=fetch,now=Da
 
 const cookieToken=h=>(h||'').split(/;\s*/).find(c=>c.startsWith('CF_Authorization='))?.slice(17);
 
+// Returns {claims} for a verified visitor, or {response} with the refusal to send back. Fails closed without configuration.
+export async function requireAccess(request,env,fetchKeys=fetch){
+ const domain=String(env.ACCESS_TEAM_DOMAIN||'').trim().replace(/^https?:\/\//,'').replace(/\/+$/,''),aud=String(env.ACCESS_AUD||'').trim();
+ if(!domain||!aud)return {response:page(503,'Belum dikonfigurasi','ACCESS_TEAM_DOMAIN dan ACCESS_AUD belum diisi. Aplikasi menolak semua akses sampai login Cloudflare Access terpasang.')};
+ const token=request.headers.get('cf-access-jwt-assertion')||cookieToken(request.headers.get('cookie'));
+ let claims=null;
+ try{claims=await verifyAccessToken(token,{domain,aud,fetchKeys})}
+ catch{return {response:page(503,'Login sedang tidak tersedia','Kunci Cloudflare Access tidak dapat diambil. Coba lagi sebentar.')}}
+ if(!claims)return {response:page(401,'Perlu masuk','Buka aplikasi lewat alamat yang dilindungi Cloudflare Access lalu masuk dengan email yang diizinkan.')};
+ return {claims};
+}
+
 export function createGate(inner,options={}){
  return {async fetch(request,env,ctx){
-  const domain=String(env.ACCESS_TEAM_DOMAIN||'').trim().replace(/^https?:\/\//,'').replace(/\/+$/,''),aud=String(env.ACCESS_AUD||'').trim();
-  if(!domain||!aud)return page(503,'Belum dikonfigurasi','ACCESS_TEAM_DOMAIN dan ACCESS_AUD belum diisi. Aplikasi menolak semua akses sampai login Cloudflare Access terpasang.');
   const url=new URL(request.url);
+  // Refuse before anything else, sign-out included, so an unconfigured deployment answers the same everywhere.
+  if(!String(env.ACCESS_TEAM_DOMAIN||'').trim()||!String(env.ACCESS_AUD||'').trim())return (await requireAccess(request,env,options.fetchKeys||fetch)).response;
   if(url.pathname==='/signout-with-chatgpt')return Response.redirect(url.origin+'/cdn-cgi/access/logout',302);
-  const token=request.headers.get('cf-access-jwt-assertion')||cookieToken(request.headers.get('cookie'));
-  let claims=null;
-  try{claims=await verifyAccessToken(token,{domain,aud,fetchKeys:options.fetchKeys||fetch})}
-  catch{return page(503,'Login sedang tidak tersedia','Kunci Cloudflare Access tidak dapat diambil. Coba lagi sebentar.')}
-  if(!claims)return page(401,'Perlu masuk','Buka aplikasi lewat alamat yang dilindungi Cloudflare Access lalu masuk dengan email yang diizinkan.');
+  const {claims,response}=await requireAccess(request,env,options.fetchKeys||fetch);
+  if(response)return response;
   const headers=new Headers(request.headers);
   for(const h of IDENTITY)headers.delete(h);
   // Access "sub" is stable per person per account; prefix keeps these ids apart from ChatGPT ids if data is ever merged.

@@ -1,0 +1,24 @@
+# The /demo Worker: role switching without login, sample data only. Never bind the real database here.
+# Steps: web/cloudflare/DEPLOY-DEMO-CLOUDFLARE.md
+name = "pamanku-demo"
+main = "cloudflare/demo-entry.mjs"
+compatibility_date = "2025-10-01"
+preview_urls = false
+
+# The panel is sent to the browser as is, so it is bundled as text instead of being executed in the Worker.
+[[rules]]
+type = "Text"
+globs = ["**/presenter-panel.js"]
+fallthrough = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pamanku-demo"
+# Fill in with the id printed by: npx wrangler@4 d1 create pamanku-demo
+database_id = "ISI-DATABASE-ID-DEMO"
+
+[vars]
+# Zero Trust team domain, e.g. "peternakan.cloudflareaccess.com"
+ACCESS_TEAM_DOMAIN = ""
+# Application Audience (AUD) Tag of the Access application for THIS Worker, not the one for the real app
+ACCESS_AUD = ""
